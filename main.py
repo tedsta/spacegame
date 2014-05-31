@@ -20,6 +20,7 @@ try:
     ship = Ship()
     ship.add_room(res.room2x2, 0, 0)
     ship.add_room(res.room2x2, 0, 2)
+    ship.add_room(res.room2x1, 1, 2)
     
 except IOError:
     exit(1)

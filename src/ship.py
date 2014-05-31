@@ -17,14 +17,22 @@ class Ship:
     def add_room(self, room_type, x, y):
         width, height = res.room_dims[res.room2x2]
         
+        # Make sure there's space for the new room
+        for i in range(x, x+width):
+            for j in range(y, y+height):
+                if self._room_grid.get(i, j): # Collides with existing room
+                    return False
+        
+        # Create the room
         room = Room(room_type, x, y, width, height, res.room_textures[res.room2x2])
         room.sprite.position = sf.Vector2(x*res.block_size, y*res.block_size)+self._room_offset
         
-        for x in range(x, width):
-            for y in range(y, height):
-                self._room_grid.set(x, y, room)
+        for j in range(x, x+width):
+            for j in range(y, y+height):
+                self._room_grid.set(i, j, room)
         
         self._rooms.append(room)
+        return True
     
     def draw(self, target):
         target.draw(self._back)
