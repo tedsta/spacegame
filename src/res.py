@@ -3,6 +3,11 @@
 import sfml as sf
 
 ###################
+# crew stuff
+
+crew = sf.Texture.from_file("content/textures/crew/operative_sprite.png")
+
+###################
 # ship stuff
 
 ship = sf.Texture.from_file("content/textures/ships/ship.png")

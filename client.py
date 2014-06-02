@@ -2,12 +2,13 @@
 
 import sfml as sf
 
-from src.input_system import InputSystem
 import src.res as res
+from src.input_system import InputSystem
+from src.battle_state import ClientBattleState
 from src.ship import Ship
 
 # create the main window
-window = sf.RenderWindow(sf.VideoMode(800, 480), "pySFML Window")
+window = sf.RenderWindow(sf.VideoMode(800, 480), "Space Game")
 window.key_repeat_enabled = False
 
 input = InputSystem(window)
@@ -21,6 +22,9 @@ try:
     ship.add_room(res.room2x2, 0, 0)
     ship.add_room(res.room2x2, 0, 2)
     ship.add_room(res.room2x1, 1, 2)
+    
+    # Create the battle state
+    battle_state = ClientBattleState(input, ship)
     
 except IOError:
     exit(1)
@@ -40,15 +44,15 @@ while window.is_open:
         frame_rate.string = str(frame_accum)
         dt_accum = 0
         frame_accum = 0
-
-    # Handle input
-    input.handle()
+    
+    # Update game state
+    battle_state.update(dt)
     
     ## Draw
     
     window.clear(sf.Color(120, 120, 120)) # clear screen
     
-    ship.draw(window)
+    battle_state.draw(window)
     
     # Draw framerate
     window.draw(frame_rate)
