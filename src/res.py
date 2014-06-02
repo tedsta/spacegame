@@ -15,21 +15,6 @@ ship = sf.Texture.from_file("content/textures/ships/ship.png")
 ###################
 # room stuff
 
-# room block size
-block_size = 35
-
-# room index ids
-room2x2 = 0
-room2x1 = 1
-room1x2 = 2
-
-# room dimensions
-room_dims = [\
-(2,2),\
-(2,1),\
-(1,2),\
-]
-
 # room textures
 room_textures = [\
 sf.Texture.from_file("content/textures/rooms/2x2.png"),\

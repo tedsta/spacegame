@@ -3,6 +3,7 @@
 import sfml as sf
 
 import src.res as res
+import src.const as const
 from src.input_system import InputSystem
 from src.battle_state import ClientBattleState
 from src.ship import Ship
@@ -19,9 +20,9 @@ try:
 
     # Create a ship
     ship = Ship()
-    ship.add_room(res.room2x2, 0, 0)
-    ship.add_room(res.room2x2, 0, 2)
-    ship.add_room(res.room2x1, 1, 2)
+    ship.add_room(const.room2x2, 0, 0)
+    ship.add_room(const.room2x2, 0, 2)
+    ship.add_room(const.room2x1, 1, 2)
     
     # Create the battle state
     battle_state = ClientBattleState(input, ship)

@@ -3,6 +3,7 @@
 import sfml as sf
 
 import src.res as res
+import src.const as const
 from src.grid import Grid
 from src.room import Room
 
@@ -15,7 +16,7 @@ class Ship:
         self._room_grid = Grid(10, 10)
     
     def add_room(self, room_type, x, y):
-        width, height = res.room_dims[res.room2x2]
+        width, height = const.room_dims[const.room2x2]
         
         # Make sure there's space for the new room
         for i in range(x, x+width):
@@ -24,8 +25,8 @@ class Ship:
                     return False
         
         # Create the room
-        room = Room(room_type, x, y, width, height, res.room_textures[res.room2x2])
-        room.sprite.position = sf.Vector2(x*res.block_size, y*res.block_size)+self._room_offset
+        room = Room(room_type, x, y, width, height, res.room_textures[const.room2x2])
+        room.sprite.position = sf.Vector2(x*const.block_size, y*const.block_size)+self._room_offset
         
         for j in range(x, x+width):
             for j in range(y, y+height):
