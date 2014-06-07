@@ -12,8 +12,13 @@ class Ship:
     def __init__(self):
         self._back = sf.Sprite(res.ship)
         self._room_offset = sf.Vector2(35, 10) # Offset of room origin
+        
+        # Room stuff
         self._rooms = []
         self._room_grid = Grid(10, 10)
+        
+        # Crew stuff
+        self._crew = []
     
     def add_room(self, room_type, x, y):
         width, height = const.room_dims[const.room2x2]
@@ -35,7 +40,23 @@ class Ship:
         self._rooms.append(room)
         return True
     
+    def add_crew(self, crew, ship_position):
+        # Make sure space is empty
+        for crew in self._crew:
+            if crew.ship_position == ship_position:
+                return False
+        # Make sure the space is a room
+        if not self._room_grid.get(ship_position.x, ship_position.y):
+            return False
+        # All is well, add the member
+        self._crew.append(crew)
+        crew.ship_position = ship_position
+        crew.sprite.position = self.sprite.position+(ship_position*const.block_size)
+        return True
+    
     def draw(self, target):
         target.draw(self._back)
         for room in self._rooms:
             target.draw(room.sprite)
+        for crew in self._crew:
+            target.draw(crew.sprite)

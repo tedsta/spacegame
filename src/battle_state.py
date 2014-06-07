@@ -50,6 +50,9 @@ class ClientBattleState:
     def draw(self, target):
         self._player_ship.draw(target)
         
+        # Draw crew interface
+        self._crew_interface.draw(target)
+        
         # Draw timer
         if self._mode == const.plan:
             self._timer_text.string = str(math.floor(const.turn_time-self._turn_timer))
