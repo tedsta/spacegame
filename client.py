@@ -7,6 +7,7 @@ import src.const as const
 from src.input_system import InputSystem
 from src.battle_state import ClientBattleState
 from src.ship import Ship
+from src.crew import Crew
 
 # create the main window
 window = sf.RenderWindow(sf.VideoMode(800, 480), "Space Game")
@@ -23,6 +24,10 @@ try:
     ship.add_room(const.room2x2, 0, 0)
     ship.add_room(const.room2x2, 0, 2)
     ship.add_room(const.room2x1, 1, 2)
+    
+    # Create a crew
+    crew = Crew()
+    ship.add_crew(crew, sf.Vector2(1, 1))
     
     # Create the battle state
     battle_state = ClientBattleState(input, ship)

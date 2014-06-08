@@ -10,7 +10,7 @@ from src.room import Room
 class Ship:
 
     def __init__(self):
-        self._back = sf.Sprite(res.ship)
+        self._sprite = sf.Sprite(res.ship)
         self._room_offset = sf.Vector2(35, 10) # Offset of room origin
         
         # Room stuff
@@ -51,11 +51,11 @@ class Ship:
         # All is well, add the member
         self._crew.append(crew)
         crew.ship_position = ship_position
-        crew.sprite.position = self.sprite.position+(ship_position*const.block_size)
+        crew.sprite.position = self._sprite.position+self._room_offset+(ship_position*const.block_size)
         return True
     
     def draw(self, target):
-        target.draw(self._back)
+        target.draw(self._sprite)
         for room in self._rooms:
             target.draw(room.sprite)
         for crew in self._crew:

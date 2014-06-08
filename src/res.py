@@ -6,6 +6,8 @@ import sfml as sf
 # crew stuff
 
 crew = sf.Texture.from_file("content/textures/crew/operative_sprite.png")
+blue_crew = sf.Texture.from_file("content/textures/crew/blue.png")
+blue_crew_highlighted = sf.Texture.from_file("content/textures/crew/blue_highlighted.png")
 
 ###################
 # ship stuff
