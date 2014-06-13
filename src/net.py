@@ -26,8 +26,8 @@ class NetClient:
         self.host = enet.Host(None, 1, 0, 0, 0)
         self.peer = host.connect(enet.Address(host.encode("utf-8"), port), 1)
     
-    def send(self, message):
-        self.peer.send(0, enet.Packet(message))
+    def send(self, packet):
+        self.peer.send(0, enet.Packet(packet.to_bytes()))
     
     def disconnect(self):
         self.peer.disconnect()
