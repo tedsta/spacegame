@@ -3,14 +3,20 @@ import pickle
 
 class Packet:
 
-    def __init__(self):
-        self.data = []
+    def __init__(self, bytes_data = b""):
+        if bytes_data:
+            self.data = pickle.loads(bytes_data)
+        else:
+            self.data = []
     
     def write(self, object):
         self.data.append(pickle.dumps(object))
     
     def read(self):
         return pickle.loads(self.data.pop(0))
+    
+    def to_bytes(self):
+        return pickle.dumps(self.data)
 
 ###############################################################################
 
