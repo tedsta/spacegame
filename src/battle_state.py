@@ -63,7 +63,7 @@ class ClientBattleState:
 
 class ServerBattleState:
 
-    def __init__(self, input, player_ship, enemy_ship=None):
+    def __init__(self, player_ship, enemy_ship=None):
         # Set player and enemy ships
         self._player_ship = player_ship
         self._enemy_ship = enemy_ship

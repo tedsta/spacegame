@@ -20,11 +20,24 @@ class Packet:
 
 ###############################################################################
 
-class NetClient:
+class Handler:
+
+    def on_connect(self, client_id):
+        pass
+
+    def on_disconnect(self, client_id):
+        pass
+
+    def handle_packet(self, packet):
+        pass
+
+###############################################################################
+
+class Client:
 
     def __init__(self, host, port):
         self.host = enet.Host(None, 1, 0, 0, 0)
-        self.peer = host.connect(enet.Address(host.encode("utf-8"), port), 1)
+        self.peer = self.host.connect(enet.Address(host.encode("utf-8"), port), 1)
     
     def send(self, packet):
         self.peer.send(0, enet.Packet(packet.to_bytes()))
@@ -34,43 +47,52 @@ class NetClient:
     
     def update(self):
         for i in range(100):
-            event = self.host.service(1)
-            if not event:
+            event = self.host.service(0)
+            if event.type == enet.EVENT_TYPE_NONE:
                 break
 
             if event.type == enet.EVENT_TYPE_CONNECT:
                 print("%s: CONNECT" % event.peer.address)
             elif event.type == enet.EVENT_TYPE_DISCONNECT:
                 print("%s: DISCONNECT" % event.peer.address)
-                run = False
                 break
             elif event.type == enet.EVENT_TYPE_RECEIVE:
-                print("%s: IN:  %r" % (event.peer.address, event.packet.data))
+                for handler in self.handlers:
+                    packet = Packet(event.packet.data)
+                    handler.handle_packet(packet, 0)
 
 
 ###############################################################################
 
-class NetServer:
+class Server:
     
     def __init__(self, port):
         self.host = enet.Host(enet.Address(b"localhost", port), 10, 0, 0, 0)
+        self.peers = {} # Map client IDs to peers
+        self.handlers = []
+        self.next_client_id = 1
+
+    def add_handler(self, handler):
+        self.handlers.append(handler)
     
     def update(self):
-        event = self.host.service(1)
-        if event.type == enet.EVENT_TYPE_CONNECT:
-            print("%s: CONNECT" % event.peer.address)
-            connect_count += 1
-        elif event.type == enet.EVENT_TYPE_DISCONNECT:
-            print("%s: DISCONNECT" % event.peer.address)
-            connect_count -= 1
-            if connect_count <= 0 and shutdown_recv:
-                run = False
-        elif event.type == enet.EVENT_TYPE_RECEIVE:
-            print("%s: IN:  %r" % (event.peer.address, event.packet.data))
-            msg = event.packet.data
-            if event.peer.send(0, enet.Packet(msg)) < 0:
-                print("%s: Error sending echo packet!" % event.peer.address)
-            else:
-                print("%s: OUT: %r" % (event.peer.address, msg))
-            if event.packet.data == "SHUTDOWN":
-                shutdown_recv = True
+        for i in range(100):
+            event = self.host.service(0)
+            if event.type == enet.EVENT_TYPE_NONE:
+               break 
+
+            client_id = str(event.peer.address)
+            if event.type == enet.EVENT_TYPE_CONNECT:
+                print("Client "+str(client_id)+" connected from " + str(event.peer.address))
+                self.peers[client_id] = event.peer
+                for handler in self.handlers:
+                    handler.on_connect(client_id)
+                self.next_client_id += 1
+            elif event.type == enet.EVENT_TYPE_DISCONNECT:
+                print("Client "+str(client_id)+" has disconnected.")
+                for handler in self.handlers:
+                    handler.on_disconnect(client_id)
+            elif event.type == enet.EVENT_TYPE_RECEIVE:
+                for handler in self.handlers:
+                    packet = Packet(event.packet.data)
+                    handler.handle_packet(packet, client_id)

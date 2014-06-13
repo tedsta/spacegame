@@ -6,15 +6,9 @@ import src.res as res
 import src.const as const
 import src.net as net
 from src.input_system import InputSystem
-from src.battle_state import ClientBattleState
+from src.battle_state import ServerBattleState
 from src.ship import Ship
 from src.crew import Crew
-
-# create the main window
-window = sf.RenderWindow(sf.VideoMode(800, 480), "Space Game")
-window.key_repeat_enabled = False
-
-input = InputSystem(window)
 
 try:
     # Create the frame rate text
@@ -31,10 +25,10 @@ try:
     ship.add_crew(crew, sf.Vector2(1, 1))
     
     # Create the battle state
-    battle_state = ClientBattleState(input, ship)
+    battle_state = ServerBattleState(ship)
 
-    # Connect to server
-    client = net.Client("localhost", 30000)
+    # Create the server connection
+    server = net.Server(30000)
     
 except IOError:
     exit(1)
@@ -44,7 +38,7 @@ frame_accum = 0
 dt_accum = 0
 
 # start the game loop
-while window.is_open:
+while True:
     dt = clock.restart().seconds
     
     # Calculate framerate
@@ -55,19 +49,8 @@ while window.is_open:
         dt_accum = 0
         frame_accum = 0
 
-    # Update connection
-    client.update()
+    # Update the server
+    server.update()
     
     # Update game state
     battle_state.update(dt)
-    
-    ## Draw
-    
-    window.clear(sf.Color(120, 120, 120)) # clear screen
-    
-    battle_state.draw(window)
-    
-    # Draw framerate
-    window.draw(frame_rate)
-    
-    window.display() # update the window
