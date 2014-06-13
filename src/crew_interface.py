@@ -37,6 +37,19 @@ class CrewInterface(MouseHandler):
             # Reset draw rectangle
             self._rectangle.position = self._select_start
             self._rectangle.size = sf.Vector2(0, 0)
+        elif button == sf.Mouse.RIGHT:
+            # Right mouse button pressed - set destination
+            # First, find selected room
+            target_room = None
+            for room in self._ship._rooms:
+                room_rect = sf.Rectangle()
+                room_rect.position = self._ship._sprite.position+self._ship._room_offset+(room.position*const.block_size)
+                room_rect.size = sf.Vector2(room.width*const.block_size, room.height*const.block_size)
+                if room_rect.contains(sf.Vector2(x, y)):
+                    target_room = room
+            if not target_room:
+                return # No room targeted
+            print(target_room.position.x, target_room.position.y)
     
     def on_mouse_button_released(self, button, x, y):
         if button == sf.Mouse.LEFT and self._selecting:

@@ -13,6 +13,7 @@ class Crew:
         self.sprite.init(1, 1)
         self.path = []
         self.highlighted = False
+        self.destination = sf.Vector2(0, 0) # Plan destination
     
     def set_highlighted(self, highlight):
         if highlight:
