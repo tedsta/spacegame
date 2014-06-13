@@ -36,11 +36,33 @@ class Handler:
 class Client:
 
     def __init__(self, host, port):
+        # Connect
         self.host = enet.Host(None, 1, 0, 0, 0)
         self.peer = self.host.connect(enet.Address(host.encode("utf-8"), port), 1)
+
+        # Wait up to 5 seconds for connection to succeed
+        event = self.host.service(5000)
+        if event.type == enet.EVENT_TYPE_CONNECT:
+            print("Successfully connected to server.")
+        else:
+            raise Exception("Failed to connect to server")
+
+        # Receive client ID from server
+        event = self.host.service(1000)
+        if event.type == enet.EVENT_TYPE_RECEIVE:
+            self.client_id = pickle.loads(event.packet.data)
+            print("Client ID is "+str(self.client_id))
+        else:
+            raise Exception("Failed to receive client ID from server.")
+
+        # Other stuff
+        self.handlers = []
     
     def send(self, packet):
         self.peer.send(0, enet.Packet(packet.to_bytes()))
+
+    def add_handler(self, handler):
+        self.handlers.append(handler)
     
     def disconnect(self):
         self.peer.disconnect()
@@ -51,10 +73,8 @@ class Client:
             if event.type == enet.EVENT_TYPE_NONE:
                 break
 
-            if event.type == enet.EVENT_TYPE_CONNECT:
-                print("%s: CONNECT" % event.peer.address)
-            elif event.type == enet.EVENT_TYPE_DISCONNECT:
-                print("%s: DISCONNECT" % event.peer.address)
+            if event.type == enet.EVENT_TYPE_DISCONNECT:
+                print("Disconnected from server.")
                 break
             elif event.type == enet.EVENT_TYPE_RECEIVE:
                 for handler in self.handlers:
@@ -84,6 +104,9 @@ class Server:
             client_id = str(event.peer.address)
             if event.type == enet.EVENT_TYPE_CONNECT:
                 print("Client "+str(client_id)+" connected from " + str(event.peer.address))
+                # Send client ID
+                event.peer.send(0, enet.Packet(pickle.dumps(client_id)))
+                # Handle connection
                 self.peers[client_id] = event.peer
                 for handler in self.handlers:
                     handler.on_connect(client_id)
