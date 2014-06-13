@@ -49,7 +49,10 @@ class CrewInterface(MouseHandler):
                     target_room = room
             if not target_room:
                 return # No room targeted
-            print(target_room.position.x, target_room.position.y)
+            for crew in self.selected_crew:
+                if target_room.is_full():
+                    break
+                crew.destination = target_room.get_free_position()
     
     def on_mouse_button_released(self, button, x, y):
         if button == sf.Mouse.LEFT and self._selecting:

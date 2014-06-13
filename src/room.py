@@ -11,3 +11,9 @@ class Room:
         self.width = width
         self.height = height
         self.sprite = sf.Sprite(texture)
+    
+    def is_full(self):
+        return False
+    
+    def get_free_position(self):
+        return self.position
