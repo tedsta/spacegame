@@ -28,7 +28,7 @@ class Handler:
     def on_disconnect(self, client_id):
         pass
 
-    def handle_packet(self, packet):
+    def handle_packet(self, packet, client_id):
         pass
 
 ###############################################################################

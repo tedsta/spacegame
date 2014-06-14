@@ -66,6 +66,7 @@ class CrewInterface(MouseHandler):
                 crew_rect = sf.Rectangle(sf.Vector2(crew_left, crew_top), sf.Vector2(crew_width, crew_height))
                 if intersects(select_rect, crew_rect):
                     crew.set_highlighted(True)
+                    self.selected_crew.append(crew)
                 else:
                     crew.set_highlighted(False)
     

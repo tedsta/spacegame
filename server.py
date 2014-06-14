@@ -23,12 +23,12 @@ try:
     # Create a crew
     crew = Crew()
     ship.add_crew(crew, sf.Vector2(1, 1))
-    
-    # Create the battle state
-    battle_state = ServerBattleState(ship)
 
     # Create the server connection
     server = net.Server(30000)
+    
+    # Create the battle state
+    battle_state = ServerBattleState(server, ship)
     
 except IOError:
     exit(1)

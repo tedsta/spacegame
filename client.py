@@ -30,11 +30,11 @@ try:
     crew = Crew()
     ship.add_crew(crew, sf.Vector2(1, 1))
     
-    # Create the battle state
-    battle_state = ClientBattleState(input, ship)
-
     # Connect to server
     client = net.Client("localhost", 30000)
+    
+    # Create the battle state
+    battle_state = ClientBattleState(input, client, ship)
     
 except IOError:
     exit(1)
@@ -61,6 +61,7 @@ while window.is_open:
     # Update game state
     battle_state.update(dt)
     
+    ####################
     ## Draw
     
     window.clear(sf.Color(120, 120, 120)) # clear screen
