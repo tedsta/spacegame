@@ -19,6 +19,14 @@ class Ship:
         
         # Crew stuff
         self._crew = []
+
+    def serialize(self, packet):
+        packet.write([room.tuplify() for room in self._rooms])
+        packet.write([crew.tuplify() for crew in self._crew])
+
+    def deserialize(self, packet):
+        self._rooms = [Room(*room) for room in packet.read()]
+        self._crew = [Crew(*crew) for crew in packet.read()]
     
     def add_room(self, room_type, x, y):
         width, height = const.room_dims[const.room2x2]
@@ -30,7 +38,7 @@ class Ship:
                     return False
         
         # Create the room
-        room = Room(room_type, x, y, width, height, res.room_textures[const.room2x2])
+        room = Room(room_type, x, y, width, height)
         room.sprite.position = sf.Vector2(x*const.block_size, y*const.block_size)+self._room_offset
         
         for j in range(x, x+width):

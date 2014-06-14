@@ -7,6 +7,13 @@ plan = 0
 simulate = 1
 
 turn_time = 10
+sim_time = 5
+
+###################
+# networking stuff
+
+packet_plans = 0
+packet_next_turn = 1
 
 ###################
 # room stuff
