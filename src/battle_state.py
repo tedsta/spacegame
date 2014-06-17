@@ -128,6 +128,8 @@ class ServerBattleState(net.Handler):
 
         # Crew index
         self.crew_index = {}
+        for crew in self.player_ship._crew:
+            self.crew_index[crew.id] = crew
     
     def update(self, dt):
         if self.mode == const.plan:
