@@ -101,7 +101,9 @@ class ClientBattleState(net.Handler):
 
     def end_simulation(self):
         for crew in self.player_ship._crew:
-            crew.position = crew.destination
+            if not crew.path:
+                continue
+            crew.position = sf.Vector2(*crew.path[-1])
             crew.sprite.position = self.player_ship._sprite.position+self.player_ship._room_offset+(crew.position*const.block_size)
     
     def draw(self, target):
