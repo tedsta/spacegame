@@ -92,6 +92,9 @@ class Server:
         self.handlers = []
         self.next_client_id = 1
 
+    def broadcast(self, packet):
+        self.host.broadcast(0, enet.Packet(packet.to_bytes()))
+
     def add_handler(self, handler):
         self.handlers.append(handler)
     

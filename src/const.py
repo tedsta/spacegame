@@ -13,7 +13,8 @@ sim_time = 5
 # networking stuff
 
 packet_plans = 0
-packet_next_turn = 1
+packet_sim_result = 1
+packet_next_turn = 2
 
 ###################
 # room stuff
