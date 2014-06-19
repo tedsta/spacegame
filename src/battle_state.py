@@ -35,7 +35,7 @@ class ClientBattleState(net.Handler):
 
         # Crew index
         self.crew_index = {}
-        for crew in self.player_ship._crew:
+        for crew in self.player_ship.crew:
             self.crew_index[crew.id] = crew
     
     def update(self, dt):
@@ -64,7 +64,7 @@ class ClientBattleState(net.Handler):
         packet.write(self.turn_number)
         # Build crew destinations dictionary
         crew_destinations = {}
-        for crew in self.player_ship._crew:
+        for crew in self.player_ship.crew:
             if crew.destination:
                 crew_destinations[crew.id] = (crew.destination.x, crew.destination.y)
         packet.write(crew_destinations)
@@ -89,7 +89,7 @@ class ClientBattleState(net.Handler):
         self.apply_simulation_time(self.turn_timer)
 
     def apply_simulation_time(self, time):
-        for crew in self.player_ship._crew:
+        for crew in self.player_ship.crew:
             if not crew.path: # Skip crew with no path
                 continue
             time_index = math.floor(time)
@@ -101,14 +101,14 @@ class ClientBattleState(net.Handler):
                 end_pos = sf.Vector2(*crew.path[time_index+1])
                 position = start_pos + (end_pos-start_pos)*interp_time
             crew.position = position
-            crew.sprite.position = self.player_ship._sprite.position+self.player_ship._room_offset+(position*const.block_size)
+            crew.sprite.position = self.player_ship.sprite.position+self.player_ship.room_offset+(position*const.block_size)
 
     def end_simulation(self):
-        for crew in self.player_ship._crew:
+        for crew in self.player_ship.crew:
             if not crew.path:
                 continue
             crew.position = sf.Vector2(*crew.path[-1])
-            crew.sprite.position = self.player_ship._sprite.position+self.player_ship._room_offset+(crew.position*const.block_size)
+            crew.sprite.position = self.player_ship.sprite.position+self.player_ship.room_offset+(crew.position*const.block_size)
             # Clear path
             crew.path[:] = []
             # Check if crew reached destination
@@ -169,7 +169,7 @@ class ServerBattleState(net.Handler):
         # Crew index
         self.crew_index = {}
         for ship in ships.values():
-            for crew in ship._crew:
+            for crew in ship.crew:
                 self.crew_index[crew.id] = crew
     
     def update(self, dt):

@@ -32,40 +32,40 @@ class MouseHandler(metaclass=ABCMeta):
 class InputSystem:
 
     def __init__(self, window):
-        self._window = window
-        self._old_mouse_pos = sf.Vector2(0, 0)
-        self._key_handlers = []
-        self._mouse_handlers = []
+        self.window = window
+        self.old_mouse_pos = sf.Vector2(0, 0)
+        self.key_handlers = []
+        self.mouse_handlers = []
     
     def handle(self):
-        for event in self._window.events:
+        for event in self.window.events:
             # close window: exit
             if type(event) is sf.CloseEvent:
-                self._window.close()
+                self.window.close()
             # Keyboard event
             elif type(event) is sf.KeyEvent:
                 if event.pressed:
-                    for handler in self._key_handlers:
+                    for handler in self.key_handlers:
                         handler.on_key_pressed(event.code)
                 elif event.released:
-                    for handler in self._key_handlers:
+                    for handler in self.key_handlers:
                         handler.on_key_released(event.code)
             # Mouse button event
             elif type(event) is sf.MouseButtonEvent:
                 if event.pressed:
-                    for handler in self._mouse_handlers:
-                        handler.on_mouse_button_pressed(event.button, self._old_mouse_pos.x, self._old_mouse_pos.y)
+                    for handler in self.mouse_handlers:
+                        handler.on_mouse_button_pressed(event.button, self.old_mouse_pos.x, self.old_mouse_pos.y)
                 elif event.released:
-                    for handler in self._mouse_handlers:
-                        handler.on_mouse_button_released(event.button, self._old_mouse_pos.x, self._old_mouse_pos.y)
+                    for handler in self.mouse_handlers:
+                        handler.on_mouse_button_released(event.button, self.old_mouse_pos.x, self.old_mouse_pos.y)
             # Mouse move event
             elif type(event) is sf.MouseMoveEvent:
-                for handler in self._mouse_handlers:
-                    handler.on_mouse_moved(event.position, event.position-self._old_mouse_pos)
-                self._old_mouse_pos = event.position # Update the old mouse position
+                for handler in self.mouse_handlers:
+                    handler.on_mouse_moved(event.position, event.position-self.old_mouse_pos)
+                self.old_mouse_pos = event.position # Update the old mouse position
     
     def add_key_handler(self, handler):
-        self._key_handlers.append(handler)
+        self.key_handlers.append(handler)
     
     def add_mouse_handler(self, handler):
-        self._mouse_handlers.append(handler)
+        self.mouse_handlers.append(handler)
