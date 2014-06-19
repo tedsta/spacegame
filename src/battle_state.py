@@ -27,10 +27,11 @@ class ClientBattleState(net.Handler):
         # Turn stuff
         self.mode = const.plan
         self.turn_timer = 0
+        self.turn_number = 0
         
         # Timer text
-        self.timer_text = sf.Text("0", res.font_8bit, 20)
-        self.timer_text.position = sf.Vector2(400, 30)
+        self.turn_mode_text = sf.Text("0", res.font_8bit, 20)
+        self.turn_mode_text.position = sf.Vector2(400, 30)
 
         # Crew index
         self.crew_index = {}
@@ -50,8 +51,6 @@ class ClientBattleState(net.Handler):
         # Update turn timer
         self.turn_timer += dt
         if self.turn_timer >= const.turn_time:
-            self.mode = const.simulate
-            self.turn_timer = 0 # Reset turn timer
             self.end_turn()
             return
     
@@ -61,13 +60,20 @@ class ClientBattleState(net.Handler):
     def end_turn(self):
         packet = net.Packet()
         packet.write(const.packet_plans)
+        # Write turn number
+        packet.write(self.turn_number)
         # Build crew destinations dictionary
         crew_destinations = {}
         for crew in self.player_ship._crew:
-            crew_destinations[crew.id] = (crew.destination.x, crew.destination.y)
+            if crew.destination:
+                crew_destinations[crew.id] = (crew.destination.x, crew.destination.y)
         packet.write(crew_destinations)
         # Send the plans
         self.client.send(packet)
+
+        # Switch to wait mode
+        self.turn_timer = 0 # Reset turn timer
+        self.mode = const.wait
     
     ########################################
     # Simulate
@@ -76,8 +82,6 @@ class ClientBattleState(net.Handler):
         # Update turn timer
         self.turn_timer += dt
         if self.turn_timer >= const.sim_time:
-            self.mode = const.plan
-            self.turn_timer = 0 # Reset turn timer
             self.end_simulation()
             return
 
@@ -105,6 +109,16 @@ class ClientBattleState(net.Handler):
                 continue
             crew.position = sf.Vector2(*crew.path[-1])
             crew.sprite.position = self.player_ship._sprite.position+self.player_ship._room_offset+(crew.position*const.block_size)
+            # Clear path
+            crew.path[:] = []
+            # Check if crew reached destination
+            if crew.position == crew.destination:
+                crew.destination = None
+
+        # Increment turn
+        self.mode = const.plan
+        self.turn_timer = 0 # Reset turn timer
+        self.turn_number += 1
     
     def draw(self, target):
         self.player_ship.draw(target)
@@ -114,11 +128,14 @@ class ClientBattleState(net.Handler):
         
         # Draw timer
         if self.mode == const.plan:
-            self.timer_text.string = str(math.floor(const.turn_time-self.turn_timer))
-            target.draw(self.timer_text)
+            self.turn_mode_text.string = str(math.floor(const.turn_time-self.turn_timer))
+            target.draw(self.turn_mode_text)
+        elif self.mode == const.wait:
+            self.turn_mode_text.string = "Waiting..."
+            target.draw(self.turn_mode_text)
         elif self.mode == const.simulate:
-            self.timer_text.string = "Simulating"
-            target.draw(self.timer_text)
+            self.turn_mode_text.string = "Simulating"
+            target.draw(self.turn_mode_text)
 
     ########################################
     # Networking
@@ -130,6 +147,7 @@ class ClientBattleState(net.Handler):
             paths_dict = packet.read()
             for crew_id, path in paths_dict.items():
                 self.crew_index[crew_id].path = path
+            self.mode = const.simulate
 
 
 ###############################################################################
@@ -137,34 +155,59 @@ class ClientBattleState(net.Handler):
 
 class ServerBattleState(net.Handler):
 
-    def __init__(self, server, player_ship, enemy_ship=None):
+    def __init__(self, server, ships):
         self.server = server
         self.server.add_handler(self)
 
-        # Set player and enemy ships
-        self.player_ship = player_ship
-        self.enemy_ship = enemy_ship
+        # Setup ships
+        self.ships = ships
+        self.received_plans = {client_id:False for client_id in self.ships.keys()}
+
+        # Turn stuff
+        self.turn_number = 0
         
         # Crew index
         self.crew_index = {}
-        for crew in self.player_ship._crew:
-            self.crew_index[crew.id] = crew
+        for ship in ships.values():
+            for crew in ship._crew:
+                self.crew_index[crew.id] = crew
     
     def update(self, dt):
-        pass
-    
+        # Check if all plans have been received for this turn
+        if False not in self.received_plans.values():
+            # Send results
+            self.calculate_crew_paths()
+            self.send_simulation_results()
+            # Reset for next turn
+            self.received_plans = {client_id:False for client_id in self.ships.keys()}
+            # Increment turn number
+            self.turn_number += 1
+
     def handle_packet(self, packet, client_id):
         packet_id = packet.read()
 
         if packet_id == const.packet_plans:
+            # Make sure turn number matches up
+            turn_number = packet.read()
+            if turn_number != self.turn_number:
+                return
+            # Handle crew paths
             for crew_id, destination in packet.read().items():
-                self.crew_index[crew_id].destination = destination
-                self.calculate_crew_paths()
-                self.send_simulation_results()
+                self.crew_index[crew_id].destination = sf.Vector2(*destination)
+            # Received plans
+            self.received_plans[client_id] = True
 
     def calculate_crew_paths(self):
         for crew in self.crew_index.values():
-            crew.path = [(1, 1), (0, 1), (0, 2)]
+            if not crew.destination:
+                crew.path[:] = []
+                continue
+            crew.path = [(crew.position.x, crew.position.y), (crew.destination.x, crew.destination.y)]
+            # Apply path
+            crew.position = sf.Vector2(*crew.path[-1])
+            # Check if crew reached his destination
+            if crew.position == crew.destination:
+                crew.destination = None
 
     def send_simulation_results(self):
         packet = net.Packet()

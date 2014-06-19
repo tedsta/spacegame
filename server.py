@@ -26,9 +26,14 @@ try:
 
     # Create the server connection
     server = net.Server(30000)
+
+    # Wait for connections
+    print("Waiting for connections...")
+    server.wait_for_connections(1)
     
     # Create the battle state
-    battle_state = ServerBattleState(server, ship)
+    print("Starting game")
+    battle_state = ServerBattleState(server, {list(server.peers.keys())[0]:ship})
     
 except IOError:
     exit(1)

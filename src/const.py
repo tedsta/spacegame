@@ -4,7 +4,8 @@
 # game state stuff
 
 plan = 0
-simulate = 1
+wait = 1
+simulate = 2
 
 turn_time = 10
 sim_time = 5

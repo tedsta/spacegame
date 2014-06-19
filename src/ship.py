@@ -51,14 +51,14 @@ class Ship:
     def add_crew(self, crew, ship_position):
         # Make sure space is empty
         for crew in self._crew:
-            if crew.ship_position == ship_position:
+            if crew.position == ship_position:
                 return False
         # Make sure the space is a room
         if not self._room_grid.get(ship_position.x, ship_position.y):
             return False
         # All is well, add the member
         self._crew.append(crew)
-        crew.ship_position = ship_position
+        crew.position = ship_position
         crew.sprite.position = self._sprite.position+self._room_offset+(ship_position*const.block_size)
         return True
     

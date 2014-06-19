@@ -122,3 +122,7 @@ class Server:
                 for handler in self.handlers:
                     packet = Packet(event.packet.data)
                     handler.handle_packet(packet, client_id)
+
+    def wait_for_connections(self, count):
+        while len(self.peers) < count:
+            self.update()
