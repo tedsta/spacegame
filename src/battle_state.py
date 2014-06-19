@@ -7,6 +7,7 @@ import src.res as res
 import src.const as const
 import src.net as net
 from src.crew_interface import CrewInterface
+from src.path import find_path
 
 class ClientBattleState(net.Handler):
 
@@ -207,7 +208,12 @@ class ServerBattleState(net.Handler):
             if not crew.destination:
                 crew.path[:] = []
                 continue
-            crew.path = [(crew.position.x, crew.position.y), (crew.destination.x, crew.destination.y)]
+            grid = None  # coming soon!
+            pos = (crew.position.x, crew.position.y)
+            dest = (crew.destination.x, crew.destination.y)
+            crew.path = find_path(grid, pos, dest)
+            #crew.path = [(crew.position.x, crew.position.y), (crew.destination.x, crew.destination.y)]
+            print(crew.path)
             # Apply path
             crew.position = sf.Vector2(*crew.path[-1])
             # Check if crew reached his destination

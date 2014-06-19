@@ -12,3 +12,4 @@ class Grid:
     
     def set(self, x, y, value):
         self.data[y*self.height + x] = value
+
