@@ -34,7 +34,7 @@ try:
     client = net.Client("localhost", 30000)
     
     # Create the battle state
-    battle_state = ClientBattleState(input, client, ship)
+    battle_state = ClientBattleState(input, client, {client.client_id:ship})
     
 except IOError:
     exit(1)

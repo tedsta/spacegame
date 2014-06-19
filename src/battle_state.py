@@ -10,15 +10,15 @@ from src.crew_interface import CrewInterface
 
 class ClientBattleState(net.Handler):
 
-    def __init__(self, input, client, player_ship, enemy_ship=None):
+    def __init__(self, input, client, ships):
         self.input = input
         self.client = client
 
         client.add_handler(self)
         
-        # Set player and enemy ships
-        self.player_ship = player_ship
-        self.enemy_ship = enemy_ship
+        # Ships
+        self.ships = ships
+        self.player_ship = self.ships[self.client.client_id]
         
         # Create the crew interface
         self.crew_interface = CrewInterface(self.player_ship)
@@ -35,8 +35,9 @@ class ClientBattleState(net.Handler):
 
         # Crew index
         self.crew_index = {}
-        for crew in self.player_ship.crew:
-            self.crew_index[crew.id] = crew
+        for ship in ships.values():
+            for crew in ship.crew:
+                self.crew_index[crew.id] = crew
     
     def update(self, dt):
         if self.mode == const.plan:
@@ -89,31 +90,33 @@ class ClientBattleState(net.Handler):
         self.apply_simulation_time(self.turn_timer)
 
     def apply_simulation_time(self, time):
-        for crew in self.player_ship.crew:
-            if not crew.path: # Skip crew with no path
-                continue
-            time_index = math.floor(time)
-            interp_time = time-time_index
-            if time_index+1 >= len(crew.path): # Reached end of path
-                position = sf.Vector2(*crew.path[-1])
-            else:
-                start_pos = sf.Vector2(*crew.path[time_index])
-                end_pos = sf.Vector2(*crew.path[time_index+1])
-                position = start_pos + (end_pos-start_pos)*interp_time
-            crew.position = position
-            crew.sprite.position = self.player_ship.sprite.position+self.player_ship.room_offset+(position*const.block_size)
+        for ship in self.ships.values():
+            for crew in ship.crew:
+                if not crew.path: # Skip crew with no path
+                    continue
+                time_index = math.floor(time)
+                interp_time = time-time_index
+                if time_index+1 >= len(crew.path): # Reached end of path
+                    position = sf.Vector2(*crew.path[-1])
+                else:
+                    start_pos = sf.Vector2(*crew.path[time_index])
+                    end_pos = sf.Vector2(*crew.path[time_index+1])
+                    position = start_pos + (end_pos-start_pos)*interp_time
+                crew.position = position
+                crew.sprite.position = ship.sprite.position+ship.room_offset+(position*const.block_size)
 
     def end_simulation(self):
-        for crew in self.player_ship.crew:
-            if not crew.path:
-                continue
-            crew.position = sf.Vector2(*crew.path[-1])
-            crew.sprite.position = self.player_ship.sprite.position+self.player_ship.room_offset+(crew.position*const.block_size)
-            # Clear path
-            crew.path[:] = []
-            # Check if crew reached destination
-            if crew.position == crew.destination:
-                crew.destination = None
+        for ship in self.ships.values():
+            for crew in ship.crew:
+                if not crew.path:
+                    continue
+                crew.position = sf.Vector2(*crew.path[-1])
+                crew.sprite.position = ship.sprite.position+ship.room_offset+(crew.position*const.block_size)
+                # Clear path
+                crew.path[:] = []
+                # Check if crew reached destination
+                if crew.position == crew.destination:
+                    crew.destination = None
 
         # Increment turn
         self.mode = const.plan
@@ -121,7 +124,8 @@ class ClientBattleState(net.Handler):
         self.turn_number += 1
     
     def draw(self, target):
-        self.player_ship.draw(target)
+        for ship in self.ships.values():
+            ship.draw(target)
         
         # Draw crew interface
         self.crew_interface.draw(target)
