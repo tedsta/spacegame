@@ -2,7 +2,7 @@
 
 import unittest
 from mock import Mock
-from src.path import find_path
+from src.path import find_path, _get_all_adjacent_nodes
 
 class TestPath(unittest.TestCase):
 
@@ -40,7 +40,11 @@ class TestPath(unittest.TestCase):
         actual = find_path(self.grid, self.position, destination)
         # TODO
         #self.assertEqual(actual, expected)
-       
+    
+    def test_get_all_adjacent_nodes(self):
+        position = (2, 2)
+        expected = [(1, 1), (2, 1), (3, 1), (1, 2), (3, 2), (1, 3), (2, 3), (3, 3)]
+        self.assertEqual(_get_all_adjacent_nodes(position), expected)
         
 ##########################
 def suite():
