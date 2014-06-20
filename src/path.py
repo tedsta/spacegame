@@ -11,7 +11,12 @@ def find_path(grid, position, destination):
         position: an (x, y) tuple
         destination: an (x, y) tuple
     """
-    return [position, destination]
+    path = [position]
+
+    # do stuff
+
+    path.append(destination)
+    return path
 
 def _get_available_moves(grid, position):
     x = position[0]
@@ -23,9 +28,9 @@ def _get_available_moves(grid, position):
             moves.append(_get_coordinates(position, direction))
     return moves
 
-def _get_coordinates(pos, direction):
-    x = pos[0]
-    y = pos[1]
+def _get_coordinates(position, direction):
+    x = position[0]
+    y = position[1]
     if direction == "up_left":
         return (x-1, y-1)
     elif direction == "up":
@@ -43,4 +48,10 @@ def _get_coordinates(pos, direction):
     elif direction == "down_right":
         return (x+1, y+1)
 
-
+def _manhattan_distance(position, destination):
+    pos_x = position[0]
+    pos_y = position[1]
+    dest_x = destination[0]
+    dest_y = destination[1]
+    distance = abs(pos_x - dest_x) + abs(pos_y - dest_y)
+    return distance

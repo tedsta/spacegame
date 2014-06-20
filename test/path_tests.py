@@ -2,7 +2,7 @@
 
 import unittest
 from mock import Mock
-from src.path import find_path, _get_available_moves
+from src.path import find_path, _get_available_moves, _manhattan_distance
 from src.grid import WalkDirs
 
 class TestPath(unittest.TestCase):
@@ -50,6 +50,13 @@ class TestPath(unittest.TestCase):
         expected = [(0, 0), (1, 0), (2, 0), (0, 1), (2, 1)]
         actual = _get_available_moves(self.grid, self.position)
         self.assertEqual(actual, expected)
+
+    def test_manhattan_distance(self):
+        destination = (4, 2)
+        expected = 4
+        actual = _manhattan_distance(self.position, destination)
+        self.assertEqual(actual, expected)
+
 
 ##########################
 def suite():
