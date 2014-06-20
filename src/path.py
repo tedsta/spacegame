@@ -15,23 +15,13 @@ def find_path(grid, position, destination):
         position: an (x, y) tuple
         destination: an (x, y) tuple
     """
-    if position == destination:
-        return [position, destination]
-    # Make a dict of dicts whose keys are (x, y) tuples
-    #      and whose values are {parent: __, mov_cost: __,
-    #      man_dist: __, is_open: __} dicts
     path = []
     squares = {}
-    # Initialize...
-    # Add start position to closed list.
     squares[position] = {"parent": None, "mov_cost": 0,
             "man_dist": _manhattan_distance(position, destination),
             "is_open": False}
 
     moves = _get_available_moves(grid, position)
-    # Add all available moves to open list with start position as parent
-    # ***for each position in available moves, calculate score
-        # score = movement cost to that square + manhattan dist from that square to dest
     for move in moves:
         mov_cost = _get_mov_cost(position, move)
         man_dist = _manhattan_distance(move, destination)
@@ -42,12 +32,10 @@ def find_path(grid, position, destination):
     while destination not in squares:
         current_position = _next_move(grid, current_position, destination, squares)
 
-    # Build path starting at destination and moving backwards:
     current_position = destination
     path.append(current_position)
 
     while position not in path:
-        time.sleep(1)
         path.append(squares[current_position]["parent"])
         current_position = squares[current_position]["parent"]
 
@@ -58,9 +46,6 @@ def _next_move(grid, position, destination, squares):
     moves = _get_available_moves(grid, position)
     min_score = 0
     best_move = None
-    # Add all available moves to open list with start position as parent
-    # ***for each position in available moves, calculate score
-        # score = movement cost to that square + manhattan dist from that square to dest
     for move in moves:
         mov_cost = _get_mov_cost(position, move)
         man_dist = _manhattan_distance(move, destination)
@@ -72,19 +57,12 @@ def _next_move(grid, position, destination, squares):
             best_move = move
             min_score = score
     if not min_score or not best_move:
-        # Something's wrong here
         sys.stderr.write("error in path finding at " + str(position) + "\n")
         sys.stderr.write("moves look like this: " + str(moves) + "\n")
         return path
     new_position = best_move
-    # choose position with lowest score
-    # drop that position from open list and add it to closed list
     squares[new_position]["is_open"] = False
-    # check all its available moves (don't count those on closed list)
     moves = _get_available_moves(grid, new_position)
-    # for any available move already on the open list, if its movement cost is lower from
-    #    square then update its parent to be current square. (that is, if it's cheaper to move
-    #    to current square and then to new square than to just go straight to that square)
     for move in moves:
         if move in squares:
             if squares[move]["is_open"]: 
@@ -94,7 +72,6 @@ def _next_move(grid, position, destination, squares):
                 if new_cost < old_cost:
                     squares[move]["parent"] = new_position
         else:
-            # add newly available moves to open list if relevant, with new position as parent
             mov_cost = _get_mov_cost(new_position, move)
             man_dist = _manhattan_distance(move, destination)
             squares[move] = {"parent": new_position, "mov_cost": mov_cost, 
