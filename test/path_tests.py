@@ -2,8 +2,8 @@
 
 import unittest
 from mock import Mock
-from src.path import find_path, _get_available_moves, _manhattan_distance, _get_mov_cost
-from src.grid import Grid, WalkDirs
+from src.path import find_path, _get_available_moves, _manhattan_distance, _get_mov_cost, WalkDirs
+from src.grid import Grid
 
 class TestPath(unittest.TestCase):
 

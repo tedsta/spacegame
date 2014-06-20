@@ -25,6 +25,12 @@ sf.Texture.from_file("content/textures/rooms/1x2.png"),\
 ]
 
 ###################
+# door stuff
+
+door_h = sf.Texture.from_file("content/textures/rooms/door_h.png")
+door_v = sf.Texture.from_file("content/textures/rooms/door_v.png")
+
+###################
 # fonts
 
 font_8bit = sf.Font.from_file("content/fonts/8bit.ttf")

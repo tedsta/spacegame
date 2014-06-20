@@ -24,10 +24,12 @@ try:
     ship = Ship()
     ship.add_room(const.room2x2, 0, 0)
     ship.add_room(const.room2x2, 0, 2)
+    ship.add_room(const.room2x1, 2, 3)
+    ship.add_room(const.room2x2, 3, 1)
 
     # Create a crew
     crew = Crew()
-    ship.add_crew(crew, sf.Vector2(1, 1))
+    ship.add_crew(crew, sf.Vector2(0, 0))
     
     # Connect to server
     client = net.Client("localhost", 30000)

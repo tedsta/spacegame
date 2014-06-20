@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
-from collections import namedtuple
-
-WalkDirs = namedtuple("walkdirs", "up_left up up_right left right down_left down down_right")
+import copy
 
 class Grid:
 
@@ -17,3 +15,5 @@ class Grid:
     def set(self, x, y, value):
         self.data[y*self.height + x] = value
 
+    def fill(self, value):
+        self.data = [copy.deepcopy(value) for i in range(0, width*height)]

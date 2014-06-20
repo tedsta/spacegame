@@ -4,6 +4,20 @@ import sys
 import time
 from collections import namedtuple
 
+class WalkDirs:
+    
+    def __init__(self, up_left=False, up=False, up_right=False, left=False, right=False, down_left=False, down=False, down_right=False):
+        self.up_left = up_left
+        self.up = up
+        self.up_right = up
+        self.left = left
+        self.right = right
+        self.down_left = down_left
+        self.down = down
+        self.down_right = down_right
+
+###########################################################
+
 def find_path(grid, position, destination):
     """Returns path as a list of tuples.
 
