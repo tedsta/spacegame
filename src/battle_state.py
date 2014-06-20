@@ -208,10 +208,11 @@ class ServerBattleState(net.Handler):
             if not crew.destination:
                 crew.path[:] = []
                 continue
-            grid = None  # coming soon!
+            #grid = None  # coming soon!
             pos = (crew.position.x, crew.position.y)
             dest = (crew.destination.x, crew.destination.y)
-            crew.path = find_path(grid, pos, dest)
+            #crew.path = find_path(grid, pos, dest) # coming soon!
+            crew.path = [pos, dest]
             # Apply path
             crew.position = sf.Vector2(*crew.path[-1])
             # Check if crew reached his destination
