@@ -68,6 +68,7 @@ class Client:
         self.peer.disconnect()
     
     def update(self):
+        packets = [] # list of received packets
         for i in range(100):
             event = self.host.service(0)
             if event.type == enet.EVENT_TYPE_NONE:
@@ -77,9 +78,10 @@ class Client:
                 print("Disconnected from server.")
                 break
             elif event.type == enet.EVENT_TYPE_RECEIVE:
+                packets.append(Packet(event.packet.data))
                 for handler in self.handlers:
-                    packet = Packet(event.packet.data)
-                    handler.handle_packet(packet, 0)
+                    handler.handle_packet(Packet(event.packet.data), 0)
+        return packets
 
 
 ###############################################################################
@@ -95,10 +97,14 @@ class Server:
     def broadcast(self, packet):
         self.host.broadcast(0, enet.Packet(packet.to_bytes()))
 
+    def send(self, client_id, packet):
+        self.peers[client_id].send(0, enet.Packet(packet.to_bytes()))
+
     def add_handler(self, handler):
         self.handlers.append(handler)
     
     def update(self):
+        packets = {} # Maps client_id sender to packet
         for i in range(100):
             event = self.host.service(0)
             if event.type == enet.EVENT_TYPE_NONE:
@@ -119,10 +125,20 @@ class Server:
                 for handler in self.handlers:
                     handler.on_disconnect(client_id)
             elif event.type == enet.EVENT_TYPE_RECEIVE:
+                if client_id in packets:
+                    packets[client_id].append(Packet(event.packet.data))
+                else:
+                    packets[client_id] = [Packet(event.packet.data)]
                 for handler in self.handlers:
-                    packet = Packet(event.packet.data)
-                    handler.handle_packet(packet, client_id)
+                    handler.handle_packet(Packet(event.packet.data), client_id)
+        return packets
 
     def wait_for_connections(self, count):
+        packets = {}
         while len(self.peers) < count:
-            self.update()
+            new_packets = self.update()
+            # Merge packet dictionaries
+            keys = set(packets).union(new_packets)
+            no = []
+            packets = dict((k, packets.get(k, no) + new_packets.get(k, no)) for k in keys)
+        return packets

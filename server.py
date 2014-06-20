@@ -14,26 +14,33 @@ try:
     # Create the frame rate text
     frame_rate = sf.Text("0", res.font_8bit, 20)
 
-    # Create a ship
-    ship = Ship()
-    ship.add_room(const.room2x2, 0, 0)
-    ship.add_room(const.room2x2, 0, 2)
-    ship.add_room(const.room2x1, 1, 2)
-    
-    # Create a crew
-    crew = Crew()
-    ship.add_crew(crew, sf.Vector2(1, 1))
-
     # Create the server connection
     server = net.Server(30000)
 
     # Wait for connections
     print("Waiting for connections...")
-    server.wait_for_connections(1)
+    packets = server.wait_for_connections(2)
+    ships = {}
+    while len(ships) < 2:
+        for client_id, c_packets in packets.items():
+            for packet in c_packets:
+                ships[client_id] = Ship()
+                ships[client_id].deserialize(packet)
+        packets = server.update()
+
+    # Send players their enemy ships
+    for client_id in ships:
+        for enemy_id, enemy_ship in ships.items():
+            if enemy_id == client_id:
+                continue
+            packet = net.Packet()
+            packet.write(enemy_id)
+            enemy_ship.serialize(packet)
+            server.send(client_id, packet)
     
     # Create the battle state
     print("Starting game")
-    battle_state = ServerBattleState(server, {list(server.peers.keys())[0]:ship})
+    battle_state = ServerBattleState(server, ships)
     
 except IOError:
     exit(1)

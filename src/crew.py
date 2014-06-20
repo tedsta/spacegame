@@ -7,9 +7,12 @@ from src.spritesheet import SpriteSheet
 
 class Crew:
 
-    def __init__(self):
-        self.id = 0
-        self.position = sf.Vector2(0, 0) # Position on ship grid
+    def __init__(self, id=0, position=None):
+        self.id = id
+        if position:
+            self.position = position
+        else:
+            self.position = sf.Vector2(0, 0) # Position on ship grid
         self.sprite = SpriteSheet(res.blue_crew)
         self.sprite.init(1, 1)
         self.path = []
@@ -24,4 +27,4 @@ class Crew:
         self.highlighted = highlight
 
     def tuplify(self):
-        return ()
+        return (self.id,)

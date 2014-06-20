@@ -24,17 +24,39 @@ try:
     ship = Ship()
     ship.add_room(const.room2x2, 0, 0)
     ship.add_room(const.room2x2, 0, 2)
-    ship.add_room(const.room2x1, 1, 2)
-    
+
     # Create a crew
     crew = Crew()
     ship.add_crew(crew, sf.Vector2(1, 1))
     
     # Connect to server
     client = net.Client("localhost", 30000)
+
+    crew.id = client.client_id
+
+    # Send the server my badass ship
+    ship_packet = net.Packet()
+    ship.serialize(ship_packet)
+    client.send(ship_packet)
+
+    # Receive enemy ship
+    ships = {client.client_id:ship}
+    while len(ships) < 2:
+        packets = client.update()
+        for packet in packets:
+            client_id = packet.read()
+            enemy_ship = Ship()
+            enemy_ship.deserialize(packet)
+            ships.update({client_id:enemy_ship})
+
+    for client_id, other_ship in ships.items():
+        if client_id == client.client_id:
+            other_ship.set_position(sf.Vector2(50, 50))
+        else:
+            other_ship.set_position(sf.Vector2(450, 0))
     
     # Create the battle state
-    battle_state = ClientBattleState(input, client, {client.client_id:ship})
+    battle_state = ClientBattleState(input, client, ships)
     
 except IOError:
     exit(1)

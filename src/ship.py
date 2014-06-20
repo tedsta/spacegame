@@ -5,6 +5,7 @@ import sfml as sf
 import src.res as res
 import src.const as const
 from src.grid import Grid
+from src.crew import Crew
 from src.room import Room
 
 class Ship:
@@ -25,11 +26,23 @@ class Ship:
         packet.write([crew.tuplify() for crew in self.crew])
 
     def deserialize(self, packet):
-        self.rooms = [Room(*room) for room in packet.read()]
-        self.crew = [Crew(*crew) for crew in packet.read()]
+        rooms = packet.read()
+        crews = packet.read()
+        for room_tuple in rooms: 
+            self.add_room(*room_tuple)
+        for crew_tuple in crews:
+            crew = Crew(*crew_tuple)
+            self.add_crew(crew, crew.position)
+
+    def set_position(self, position):
+        self.sprite.position = position
+        for crew in self.crew:
+            crew.sprite.position = self.sprite.position+self.room_offset+(crew.position*const.block_size)
+        for room in self.rooms:
+            room.sprite.position = self.sprite.position+sf.Vector2(room.position.x*const.block_size, room.position.y*const.block_size)+self.room_offset
     
     def add_room(self, room_type, x, y):
-        width, height = const.room_dims[const.room2x2]
+        width, height = const.room_dims[room_type]
         
         # Make sure there's space for the new room
         for i in range(x, x+width):
@@ -39,9 +52,9 @@ class Ship:
         
         # Create the room
         room = Room(room_type, x, y, width, height)
-        room.sprite.position = sf.Vector2(x*const.block_size, y*const.block_size)+self.room_offset
+        room.sprite.position = self.sprite.position+sf.Vector2(x*const.block_size, y*const.block_size)+self.room_offset
         
-        for j in range(x, x+width):
+        for i in range(x, x+width):
             for j in range(y, y+height):
                 self.room_grid.set(i, j, room)
         
@@ -50,8 +63,8 @@ class Ship:
     
     def add_crew(self, crew, ship_position):
         # Make sure space is empty
-        for crew in self.crew:
-            if crew.position == ship_position:
+        for c in self.crew:
+            if c.position == ship_position:
                 return False
         # Make sure the space is a room
         if not self.room_grid.get(ship_position.x, ship_position.y):

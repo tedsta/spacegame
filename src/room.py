@@ -19,4 +19,4 @@ class Room:
         return self.position
 
     def tuplify(self):
-        return (self.room_type, self.position.x, self.position.y, self.width, self.height)
+        return (self.room_type, self.position.x, self.position.y)

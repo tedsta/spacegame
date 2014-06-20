@@ -124,6 +124,7 @@ class ClientBattleState(net.Handler):
         self.turn_number += 1
     
     def draw(self, target):
+        # Draw ships
         for ship in self.ships.values():
             ship.draw(target)
         
