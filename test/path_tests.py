@@ -2,7 +2,8 @@
 
 import unittest
 from mock import Mock
-from src.path import find_path, _get_all_adjacent_nodes
+from src.path import find_path, _get_available_moves
+from src.grid import WalkDirs
 
 class TestPath(unittest.TestCase):
 
@@ -41,11 +42,15 @@ class TestPath(unittest.TestCase):
         # TODO
         #self.assertEqual(actual, expected)
     
-    def test_get_all_adjacent_nodes(self):
-        position = (2, 2)
-        expected = [(1, 1), (2, 1), (3, 1), (1, 2), (3, 2), (1, 3), (2, 3), (3, 3)]
-        self.assertEqual(_get_all_adjacent_nodes(position), expected)
-        
+    def test_get_available_moves(self):
+        walkdirs = WalkDirs(up_left=True, up=True, up_right=True,
+                    left=True, right=True, down_left=False,
+                    down=False, down_right=False)
+        self.grid.get.return_value = walkdirs
+        expected = [(0, 0), (1, 0), (2, 0), (0, 1), (2, 1)]
+        actual = _get_available_moves(self.grid, self.position)
+        self.assertEqual(actual, expected)
+
 ##########################
 def suite():
     suite = unittest.TestSuite()

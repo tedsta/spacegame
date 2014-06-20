@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+from collections import namedtuple
+
+WalkDirs = namedtuple("walkdirs", "up_left up up_right left right down_left down down_right")
+
 class Grid:
 
     def __init__(self, width, height):

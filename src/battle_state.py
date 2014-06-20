@@ -212,8 +212,6 @@ class ServerBattleState(net.Handler):
             pos = (crew.position.x, crew.position.y)
             dest = (crew.destination.x, crew.destination.y)
             crew.path = find_path(grid, pos, dest)
-            #crew.path = [(crew.position.x, crew.position.y), (crew.destination.x, crew.destination.y)]
-            print(crew.path)
             # Apply path
             crew.position = sf.Vector2(*crew.path[-1])
             # Check if crew reached his destination
