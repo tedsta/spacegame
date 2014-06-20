@@ -9,7 +9,7 @@ class WalkDirs:
     def __init__(self, up_left=False, up=False, up_right=False, left=False, right=False, down_left=False, down=False, down_right=False):
         self.up_left = up_left
         self.up = up
-        self.up_right = up
+        self.up_right = up_right
         self.left = left
         self.right = right
         self.down_left = down_left

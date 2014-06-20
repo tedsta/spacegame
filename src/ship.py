@@ -8,7 +8,7 @@ from src.grid import Grid
 from src.crew import Crew
 from src.room import Room
 from src.door import Door
-from src.path_finding import WalkDirs
+from src.path import WalkDirs
 
 class Ship:
 
