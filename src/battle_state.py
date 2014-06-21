@@ -111,7 +111,7 @@ class ClientBattleState(net.Handler):
             for crew in ship.crew:
                 if not crew.path:
                     continue
-                crew.position = sf.Vector2(*crew.path[-1])
+                crew.position = sf.Vector2(*crew.path[min(len(crew.path)-1, const.sim_time)])
                 crew.sprite.position = ship.sprite.position+ship.room_offset+(crew.position*const.block_size)
                 # Clear path
                 crew.path[:] = []
@@ -204,26 +204,27 @@ class ServerBattleState(net.Handler):
             self.received_plans[client_id] = True
 
     def calculate_crew_paths(self):
-        for crew in self.crew_index.values():
-            if not crew.destination:
-                crew.path[:] = []
-                continue
-            #grid = None  # coming soon!
-            pos = (crew.position.x, crew.position.y)
-            dest = (crew.destination.x, crew.destination.y)
-            #crew.path = find_path(grid, pos, dest) # coming soon!
-            crew.path = [pos, dest]
-            # Apply path
-            crew.position = sf.Vector2(*crew.path[-1])
-            # Check if crew reached his destination
-            if crew.position == crew.destination:
-                crew.destination = None
+        for ship in self.ships.values():
+            for crew in ship.crew:
+                if not crew.destination:
+                    continue
+                pos = (crew.position.x, crew.position.y)
+                dest = (crew.destination.x, crew.destination.y)
+                crew.path = find_path(ship.path_grid, pos, dest) # coming soon!
+                # Apply path
+                crew.position = sf.Vector2(*crew.path[min(len(crew.path)-1, const.sim_time)])
 
     def send_simulation_results(self):
         packet = net.Packet()
         packet.write(const.packet_sim_result)
+        # Crew paths
         paths_dict = {}
         for crew in self.crew_index.values():
             paths_dict[crew.id] = crew.path
         packet.write(paths_dict)
+        # Clear crew paths for next turn
+        for crew in self.crew_index.values():
+            crew.destination = None
+            crew.path[:] = []
+        # Send results packet
         self.server.broadcast(packet)

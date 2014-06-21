@@ -16,4 +16,4 @@ class Grid:
         self.data[y*self.height + x] = value
 
     def fill(self, value):
-        self.data = [copy.deepcopy(value) for i in range(0, width*height)]
+        self.data = [copy.deepcopy(value) for i in range(0, self.width*self.height)]

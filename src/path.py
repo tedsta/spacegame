@@ -100,32 +100,25 @@ def _get_available_moves(grid, position):
     """
     x = position[0]
     y = position[1]
-    moves = []
     walkdirs = grid.get(x, y)
-    for direction, allowed in vars(walkdirs).items():
-        if allowed:
-            moves.append(_get_coordinates(position, direction))
+    moves = []
+    if walkdirs.up_left:
+        moves.append((x-1, y-1))
+    if walkdirs.up:
+        moves.append((x, y-1))
+    if walkdirs.up_right:
+        moves.append((x+1, y-1))
+    if walkdirs.left:
+        moves.append((x-1, y))
+    if walkdirs.right:
+        moves.append((x+1, y))
+    if walkdirs.down_left:
+        moves.append((x-1, y+1))
+    if walkdirs.down:
+        moves.append((x, y+1))
+    if walkdirs.down_right:
+        moves.append((x+1, y+1))
     return moves
-
-def _get_coordinates(position, direction):
-    x = position[0]
-    y = position[1]
-    if direction == "up_left":
-        return (x-1, y-1)
-    elif direction == "up":
-        return (x, y-1)
-    elif direction == "up_right":
-        return (x+1, y-1)
-    elif direction == "left":
-        return (x-1, y)
-    elif direction == "right":
-        return (x+1, y)
-    elif direction == "down_left":
-        return (x-1, y+1)
-    elif direction == "down":
-        return (x, y+1)
-    elif direction == "down_right":
-        return (x+1, y+1)
 
 def _manhattan_distance(position, destination):
     pos_x = position[0]

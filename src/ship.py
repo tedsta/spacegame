@@ -136,7 +136,7 @@ class Ship:
 
     def _rebuild_path_grid(self):
         # Clear path grid
-        self.path_grid.fill(WalkDir())
+        self.path_grid.fill(WalkDirs())
 
         # Setup rooms' walkable area (rooms don't connect yet)
         for room in self.rooms:
@@ -144,32 +144,52 @@ class Ship:
             y = room.position.y
             width = room.width
             height = room.height
-            ### Corners
-            # Top left
-            self.path_grid.set(x, y, WalkDirs(down=True, right=True, down_right=True))
-            # Top right
-            self.path_grid.set(x+width-1, y, WalkDirs(down=True, left=True, down_left=True))
-            # Bottom left
-            self.path_grid.set(x, y+height-1, WalkDirs(up=True, right=True, up_right=True))
-            # Bottom right
-            self.path_grid.set(x+width-1, y+height-1, WalkDirs(up=True, left=True, up_left=True))
-            ### Edges
-            # X axis
-            for i in range(x+1, x+width-1):
-                # Top side
-                self.path_grid.set(i, y, WalkDirs(left=True, down_left=True, right=True, down_right=True, down=True))
-                # Bottom side
-                self.path_grid.set(i, y+height-1, WalkDirs(left=True, up_left=True, right=True, up_right=True, up=True))
-            # Y axis
-            for j in range(y+1, y+height-1):
-                # Left side
-                self.path_grid.set(x, j, WalkDirs(up=True, up_right=True, down=True, down_right=True, right=True))
-                # Right side
-                self.path_grid.set(x+width-1, j, WalkDirs(up=True, up_left=True, down=True, down_left=True, left=True))
-            ### Internals
-            for i in range(x+1, x+width-1):
+            # General case, 2d room
+            if width > 1 and height > 1:
+                ### Corners
+                # Top left
+                self.path_grid.set(x, y, WalkDirs(down=True, right=True, down_right=True))
+                # Top right
+                self.path_grid.set(x+width-1, y, WalkDirs(down=True, left=True, down_left=True))
+                # Bottom left
+                self.path_grid.set(x, y+height-1, WalkDirs(up=True, right=True, up_right=True))
+                # Bottom right
+                self.path_grid.set(x+width-1, y+height-1, WalkDirs(up=True, left=True, up_left=True))
+                ### Edges
+                # X axis
+                for i in range(x+1, x+width-1):
+                    print("x")
+                    # Top side
+                    self.path_grid.set(i, y, WalkDirs(left=True, down_left=True, right=True, down_right=True, down=True))
+                    # Bottom side
+                    self.path_grid.set(i, y+height-1, WalkDirs(left=True, up_left=True, right=True, up_right=True, up=True))
+                # Y axis
                 for j in range(y+1, y+height-1):
-                    self.path_grid.set(i, j, WalkDirs(up_left=True, up=True, up_right=True, left=True, right=True, down_left=True, down=True, down_right=True))
+                    print("y")
+                    # Left side
+                    self.path_grid.set(x, j, WalkDirs(up=True, up_right=True, down=True, down_right=True, right=True))
+                    # Right side
+                    self.path_grid.set(x+width-1, j, WalkDirs(up=True, up_left=True, down=True, down_left=True, left=True))
+                ### Internals
+                for i in range(x+1, x+width-1):
+                    for j in range(y+1, y+height-1):
+                        self.path_grid.set(i, j, WalkDirs(up_left=True, up=True, up_right=True, left=True, right=True, down_left=True, down=True, down_right=True))
+            elif height == 1: # Special case: horizontal room
+                # Left
+                self.path_grid.set(x, y, WalkDirs(right=True))
+                # Right
+                self.path_grid.set(x+width-1, y, WalkDirs(left=True))
+                # Inbetween
+                for i in range(x+1, x+width-1):
+                    self.path_grid.set(i, y, WalkDirs(left=True, right=True))
+            elif width == 1: # Special case: vertical room
+                # Left
+                self.path_grid.set(x, y, WalkDirs(down=True))
+                # Right
+                self.path_grid.set(x, y+height-1, WalkDirs(up=True))
+                # Inbetween
+                for j in range(y+1, y+height-1):
+                    self.path_grid.set(x, j, WalkDirs(down=True, up=True))
         
         # Connect rooms with doors
         for door in self.doors:
@@ -180,4 +200,4 @@ class Ship:
             # Vertical
             elif door.pos_b-door.pos_a == sf.Vector2(0, 1):
                 self.path_grid.get(door.pos_a.x, door.pos_a.y).down = True
-                self.path_grid.get(door.pos_b.x, door.pos_b.y).left = True
+                self.path_grid.get(door.pos_b.x, door.pos_b.y).up = True
