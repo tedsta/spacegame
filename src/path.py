@@ -2,6 +2,7 @@
 
 import sys
 import time
+import math
 from collections import namedtuple
 
 class WalkDirs:
@@ -43,8 +44,27 @@ def find_path(grid, position, destination):
                 "man_dist": man_dist, "is_open": True}
 
     current_position = position
+    move_history = [current_position]
     while destination not in squares:
-        current_position = _next_move(grid, current_position, destination, squares)
+        next_move = _next_move(grid, current_position, destination, squares)
+        if not next_move:
+            # Retrace backward until we can move again
+            cant_move = True
+            to_remove = []
+            for parent_pos in reversed(move_history):
+                current_position = parent_pos
+                to_remove.append(current_position)
+                moves = _get_available_moves(grid, current_position)
+                for move in moves:
+                    if squares[move]["is_open"]:
+                        cant_move = False
+                if not cant_move:
+                    break
+            for r in to_remove:
+                move_history.remove(r)
+        else:
+            current_position = next_move
+        move_history.append(current_position)
 
     current_position = destination
     path.append(current_position)
@@ -61,6 +81,8 @@ def _next_move(grid, position, destination, squares):
     min_score = 0
     best_move = None
     for move in moves:
+        if not squares[move]["is_open"]:
+            continue
         mov_cost = _get_mov_cost(position, move)
         man_dist = _manhattan_distance(move, destination)
         if move not in squares:
@@ -71,9 +93,7 @@ def _next_move(grid, position, destination, squares):
             best_move = move
             min_score = score
     if not min_score or not best_move:
-        sys.stderr.write("error in path finding at " + str(position) + "\n")
-        sys.stderr.write("moves look like this: " + str(moves) + "\n")
-        return path
+        return None
     new_position = best_move
     squares[new_position]["is_open"] = False
     moves = _get_available_moves(grid, new_position)
@@ -125,6 +145,9 @@ def _manhattan_distance(position, destination):
     pos_y = position[1]
     dest_x = destination[0]
     dest_y = destination[1]
+    dist_x = dest_x-pos_x
+    dist_y = dest_y-pos_y
+    return math.sqrt(dist_x*dist_x + dist_y*dist_y)
     distance = 10*abs(pos_x - dest_x) + 10*abs(pos_y - dest_y)
     return distance
 
