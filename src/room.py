@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 
 import sfml as sf
+import src.const as const
 import src.res as res
 
 class Room:
 
-    def __init__(self, room_type, x, y, width, height):
+    def __init__(self, room_type, x, y):
         self.room_type = room_type
         self.position = sf.Vector2(x, y)
-        self.width = width
-        self.height = height
+        self.width, self.height = const.room_dims[room_type]
         self.sprite = sf.Sprite(res.room_textures[room_type])
     
     def is_full(self):

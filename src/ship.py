@@ -61,7 +61,7 @@ class Ship:
             return False
         
         # Create the room
-        room = Room(room_type, x, y, width, height)
+        room = Room(room_type, x, y)
         room.sprite.position = self.sprite.position+sf.Vector2(x*const.block_size, y*const.block_size)+self.room_offset
 
         # Add doors
