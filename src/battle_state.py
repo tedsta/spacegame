@@ -111,7 +111,7 @@ class ClientBattleState(net.Handler):
                 # Set crew's position to where it reaches at the end of the simulation
                 crew.position = crew.get_position_at_simulation_end()
                 # Update crew's current room for crew interface
-                crew.current_room = ship._room_at(crew.position.x, crew.position.y)
+                crew.current_room = ship.room_at(crew.position.x, crew.position.y)
                 # Clear path
                 crew.path[:] = []
                 # Check if crew reached destination

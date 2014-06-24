@@ -50,25 +50,25 @@ class Ship:
         width, height = room.width, room.height
         
         # Make sure there's space for the new room
-        if self._room_at(x, y, width, height):
+        if self.room_at(x, y, width, height):
             return False
 
         # Add doors
         # X axis
         for i in range(x, x+width):
             # Top side
-            if self._room_at(i, y-1):
+            if self.room_at(i, y-1):
                 self.add_door(sf.Vector2(i, y-1), sf.Vector2(i, y))
             # Bottom side
-            if self._room_at(i, y+height):
+            if self.room_at(i, y+height):
                 self.add_door(sf.Vector2(i, y+height-1), sf.Vector2(i, y+height))
         # Y axis
         for j in range(y, y+height):
             # Left side
-            if self._room_at(x-1, j):
+            if self.room_at(x-1, j):
                 self.add_door(sf.Vector2(x-1, j), sf.Vector2(x, j))
             # Right side
-            if self._room_at(x+width, j):
+            if self.room_at(x+width, j):
                 self.add_door(sf.Vector2(x+width-1, j), sf.Vector2(x+width, j))
         
         self.rooms.append(room)
@@ -93,7 +93,7 @@ class Ship:
         position = sf.Vector2(x, y)
     
         # Make sure the space is a room
-        room = self._room_at(x, y)
+        room = self.room_at(x, y)
         if not room:
             return False
         # Take position from room free positions
@@ -106,6 +106,14 @@ class Ship:
         crew.sprite.position = self.sprite.position+self.room_offset+(position*const.block_size)
         self.crew.append(crew)
         return True
+    
+    def room_at(self, x, y, w=1, h=1):
+        for room in self.rooms:
+            # Check for room collision
+            if x < room.position.x+room.width and x+w > room.position.x and\
+               y < room.position.y+room.height and y+h > room.position.y:
+                return room
+        return None
     
     def draw(self, target):
         # First, update all the sprite positions
@@ -132,14 +140,6 @@ class Ship:
 
     ###################################
     # Helper stuff
-
-    def _room_at(self, x, y, w=1, h=1):
-        for room in self.rooms:
-            # Check for room collision
-            if x < room.position.x+room.width and x+w > room.position.x and\
-               y < room.position.y+room.height and y+h > room.position.y:
-                return room
-        return None
 
     def _rebuild_path_grid(self):
         # Clear path grid
