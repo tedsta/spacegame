@@ -47,6 +47,8 @@ class Crew:
         self.position = position
 
     def get_position_at_simulation_end(self):
+        if not self.path:
+            return self.position
         move_index = const.sim_time*self.move_speed
         return sf.Vector2(*self.path[min(len(self.path)-1, move_index)])
 

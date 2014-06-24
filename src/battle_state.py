@@ -184,7 +184,7 @@ class ServerBattleState(net.Handler):
         # Check if all plans have been received for this turn
         if False not in self.received_plans.values():
             # Send results
-            self.calculate_crew_paths()
+            self.apply_simulation()
             self.send_simulation_results()
             # Reset for next turn
             self.received_plans = {client_id:False for client_id in self.ships.keys()}
@@ -205,6 +205,16 @@ class ServerBattleState(net.Handler):
             # Received plans
             self.received_plans[client_id] = True
 
+    def apply_simulation(self):
+        self.calculate_crew_paths()
+
+        # TODO Weapons
+
+        # Move crew
+        for ship in self.ships.values():
+            for crew in ship.crew:
+                crew.position = crew.get_position_at_simulation_end() 
+
     def calculate_crew_paths(self):
         for ship in self.ships.values():
             for crew in ship.crew:
@@ -213,8 +223,6 @@ class ServerBattleState(net.Handler):
                 pos = (crew.position.x, crew.position.y)
                 dest = (crew.destination.x, crew.destination.y)
                 crew.path = find_path(ship.path_grid, pos, dest) # coming soon!
-                # Apply path
-                crew.position = crew.get_position_at_simulation_end()
 
     def send_simulation_results(self):
         packet = net.Packet()
