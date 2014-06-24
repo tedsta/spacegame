@@ -113,6 +113,8 @@ class ClientBattleState(net.Handler):
                     continue
                 crew.position = sf.Vector2(*crew.path[min(len(crew.path)-1, const.sim_time)])
                 crew.sprite.position = ship.sprite.position+ship.room_offset+(crew.position*const.block_size)
+                # Update crew's current room
+                crew.current_room = ship._room_at(crew.position.x, crew.position.y)
                 # Clear path
                 crew.path[:] = []
                 # Check if crew reached destination

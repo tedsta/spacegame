@@ -100,18 +100,22 @@ class Ship:
         self.doors.append(door)
         return True
     
-    def add_crew(self, crew, ship_position):
+    def add_crew(self, crew, position):
         # Make sure space is empty
         for c in self.crew:
-            if c.position == ship_position:
+            if c.position == position:
                 return False
         # Make sure the space is a room
-        if not self._room_at(ship_position.x, ship_position.y):
+        room = self._room_at(position.x, position.y)
+        if not room:
             return False
+        # Take position from room free positions
+        room.take_position(position)
+        crew.current_room = room # For the crew interface
         # All is well, add the member
         self.crew.append(crew)
-        crew.position = ship_position
-        crew.sprite.position = self.sprite.position+self.room_offset+(ship_position*const.block_size)
+        crew.position = position
+        crew.sprite.position = self.sprite.position+self.room_offset+(position*const.block_size)
         return True
     
     def draw(self, target):
@@ -131,8 +135,8 @@ class Ship:
             # Check for room collision
             if x < room.position.x+room.width and x+w > room.position.x and\
                y < room.position.y+room.height and y+h > room.position.y:
-                return True
-        return False
+                return room
+        return None
 
     def _rebuild_path_grid(self):
         # Clear path grid

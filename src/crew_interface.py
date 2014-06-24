@@ -52,7 +52,15 @@ class CrewInterface(MouseHandler):
             for crew in self.selected_crew:
                 if target_room.is_full():
                     break
+                if crew.destination:
+                    # Crew has prior destination: freeup the old destination
+                    crew.target_room.freeup_position(crew.destination)
+                else:
+                    # Crew has no prior destination: freeup it's current position
+                    crew.current_room.freeup_position(crew.position)
+                # Set new destination stuff
                 crew.destination = target_room.get_free_position()
+                crew.target_room = target_room
     
     def on_mouse_button_released(self, button, x, y):
         if button == sf.Mouse.LEFT and self.selecting:

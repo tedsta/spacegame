@@ -15,6 +15,10 @@ class Crew:
         self.path = []
         self.highlighted = False
         self.destination = None # Plan destination
+
+        # Crew interface stuff
+        self.current_room = None
+        self.target_room = None
     
     def set_highlighted(self, highlight):
         if highlight:
