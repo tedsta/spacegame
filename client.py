@@ -38,7 +38,9 @@ try:
     # Connect to server
     client = net.Client("localhost", 30000)
 
-    crew.id = client.client_id
+    # Setup crew IDs
+    for i, crew in enumerate(ship.crew):
+        crew.id = client.client_id+":crew"+str(i)
 
     # Send the server my badass ship
     ship_packet = net.Packet()
