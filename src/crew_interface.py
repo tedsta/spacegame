@@ -49,14 +49,16 @@ class CrewInterface(MouseHandler):
                     target_room = room
             if not target_room:
                 return # No room targeted
+            # Set each selected crew's destination to the target room
             for crew in self.selected_crew:
+                # No more space in target room - break out
                 if target_room.is_full():
                     break
                 if crew.destination:
-                    # Crew has prior destination: freeup the old destination
+                    # Crew has prior destination - freeup the old destination
                     crew.target_room.freeup_position(crew.destination)
                 else:
-                    # Crew has no prior destination: freeup it's current position
+                    # Crew has no prior destination - freeup it's current position
                     crew.current_room.freeup_position(crew.position)
                 # Set new destination stuff
                 crew.destination = target_room.get_free_position()
