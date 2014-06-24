@@ -106,8 +106,6 @@ class ClientBattleState(net.Handler):
     def end_simulation(self):
         for ship in self.ships.values():
             for crew in ship.crew:
-                if not crew.path:
-                    continue
                 # Set crew's position to where it reaches at the end of the simulation
                 crew.position = crew.get_position_at_simulation_end()
                 # Update crew's current room for crew interface
