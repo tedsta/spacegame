@@ -41,17 +41,6 @@ class Ship:
 
     def set_position(self, position):
         self.sprite.position = position
-        for crew in self.crew:
-            crew.sprite.position = self.sprite.position+self.room_offset+(crew.position*const.block_size)
-        for room in self.rooms:
-            room.sprite.position = self.sprite.position+sf.Vector2(room.position.x*const.block_size, room.position.y*const.block_size)+self.room_offset
-        for door in self.doors:
-            # Horizontal
-            if door.pos_b-door.pos_a == sf.Vector2(1, 0):
-                door.sprite.position = self.sprite.position+self.room_offset+(door.pos_b*const.block_size)+sf.Vector2(-3, 7)
-            # Vertical
-            elif door.pos_b-door.pos_a == sf.Vector2(0, 1):
-                door.sprite.position = self.sprite.position+self.room_offset+(door.pos_b*const.block_size)+sf.Vector2(7, -3)
     
     def add_room(self, room_type, x, y):
         # Create the room
@@ -119,6 +108,20 @@ class Ship:
         return True
     
     def draw(self, target):
+        # First, update all the sprite positions
+        for crew in self.crew:
+            crew.sprite.position = self.sprite.position+self.room_offset+(crew.position*const.block_size)
+        for room in self.rooms:
+            room.sprite.position = self.sprite.position+sf.Vector2(room.position.x*const.block_size, room.position.y*const.block_size)+self.room_offset
+        for door in self.doors:
+            # Horizontal
+            if door.pos_b-door.pos_a == sf.Vector2(1, 0):
+                door.sprite.position = self.sprite.position+self.room_offset+(door.pos_b*const.block_size)+sf.Vector2(-3, 7)
+            # Vertical
+            elif door.pos_b-door.pos_a == sf.Vector2(0, 1):
+                door.sprite.position = self.sprite.position+self.room_offset+(door.pos_b*const.block_size)+sf.Vector2(7, -3)
+
+        # Draw everything
         target.draw(self.sprite)
         for room in self.rooms:
             target.draw(room.sprite)

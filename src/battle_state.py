@@ -101,18 +101,8 @@ class ClientBattleState(net.Handler):
     def apply_simulation_time(self, time):
         for ship in self.ships.values():
             for crew in ship.crew:
-                if not crew.path: # Skip crew with no path
-                    continue
-                time_index, interp_time = crew.get_path_progress(time)
-                if time_index+1 >= len(crew.path): # Reached end of path
-                    position = sf.Vector2(*crew.path[-1])
-                else:
-                    start_pos = sf.Vector2(*crew.path[time_index])
-                    end_pos = sf.Vector2(*crew.path[time_index+1])
-                    position = start_pos + (end_pos-start_pos)*interp_time
-                crew.position = position
-                crew.sprite.position = ship.sprite.position+ship.room_offset+(position*const.block_size)
-
+                crew.apply_simulation_time(time)
+                
     def end_simulation(self):
         for ship in self.ships.values():
             for crew in ship.crew:
@@ -120,7 +110,6 @@ class ClientBattleState(net.Handler):
                     continue
                 # Set crew's position to where it reaches at the end of the simulation
                 crew.position = crew.get_position_at_simulation_end()
-                crew.sprite.position = ship.sprite.position+ship.room_offset+(crew.position*const.block_size)
                 # Update crew's current room for crew interface
                 crew.current_room = ship._room_at(crew.position.x, crew.position.y)
                 # Clear path

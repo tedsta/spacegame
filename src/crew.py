@@ -32,15 +32,23 @@ class Crew:
             self.sprite.texture = res.blue_crew
         self.highlighted = highlight
 
-    def get_path_progress(self, time):
-        time = time*self.move_speed
-        time_index = math.floor(time)
-        interp = (time-time_index)
-        return time_index, interp
+    def apply_simulation_time(self, time):
+        if not self.path: # Skip crew with no path
+            return
+        moves_completed = time*self.move_speed
+        move_index = math.floor(moves_completed)
+        move_interp = (moves_completed-move_index)
+        if move_index+1 >= len(self.path): # Reached end of path
+            position = sf.Vector2(*self.path[-1])
+        else:
+            start_pos = sf.Vector2(*self.path[move_index])
+            end_pos = sf.Vector2(*self.path[move_index+1])
+            position = start_pos + (end_pos-start_pos)*move_interp
+        self.position = position
 
     def get_position_at_simulation_end(self):
-        time_index, _ = self.get_path_progress(const.sim_time)
-        return sf.Vector2(*self.path[min(len(self.path)-1, time_index)])
+        move_index = const.sim_time*self.move_speed
+        return sf.Vector2(*self.path[min(len(self.path)-1, move_index)])
 
     def tuplify(self):
         return (self.id, self.position.x, self.position.y)
