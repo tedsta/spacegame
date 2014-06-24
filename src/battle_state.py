@@ -60,22 +60,30 @@ class ClientBattleState(net.Handler):
         self.input.handle()
 
     def end_turn(self):
-        packet = net.Packet()
-        packet.write(const.packet_plans)
-        # Write turn number
-        packet.write(self.turn_number)
-        # Build crew destinations dictionary
-        crew_destinations = {}
-        for crew in self.player_ship.crew:
-            if crew.destination:
-                crew_destinations[crew.id] = (crew.destination.x, crew.destination.y)
-        packet.write(crew_destinations)
-        # Send the plans
-        self.client.send(packet)
+        # Send plans packet
+        self._send_plans_packet()
 
         # Switch to wait mode
         self.turn_timer = 0 # Reset turn timer
         self.mode = const.wait
+
+    def _send_plans_packet(self):
+        packet = net.Packet()
+        packet.write(const.packet_plans)
+        # Write turn number
+        packet.write(self.turn_number)
+        # Write crew destinations dictionary
+        crew_destinations = self._build_crew_destinations_dictionary()
+        packet.write(crew_destinations)
+        # Send to server
+        self.client.send(packet)
+
+    def _build_crew_destinations_dictionary(self):
+        crew_destinations = {}
+        for crew in self.player_ship.crew:
+            if crew.destination:
+                crew_destinations[crew.id] = (crew.destination.x, crew.destination.y)
+        return crew_destinations
     
     ########################################
     # Simulate
@@ -111,9 +119,10 @@ class ClientBattleState(net.Handler):
             for crew in ship.crew:
                 if not crew.path:
                     continue
+                # Set crew's position to where it reaches at the end of the simulation
                 crew.position = sf.Vector2(*crew.path[min(len(crew.path)-1, const.sim_time)])
                 crew.sprite.position = ship.sprite.position+ship.room_offset+(crew.position*const.block_size)
-                # Update crew's current room
+                # Update crew's current room for crew interface
                 crew.current_room = ship._room_at(crew.position.x, crew.position.y)
                 # Clear path
                 crew.path[:] = []
@@ -125,6 +134,9 @@ class ClientBattleState(net.Handler):
         self.mode = const.plan
         self.turn_timer = 0 # Reset turn timer
         self.turn_number += 1
+
+    ########################################
+    # Drawing
     
     def draw(self, target):
         # Draw ships
