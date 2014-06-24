@@ -103,21 +103,19 @@ class Ship:
     def add_crew(self, crew, x, y):
         position = sf.Vector2(x, y)
     
-        # Make sure space is empty
-        for c in self.crew:
-            if c.position == position:
-                return False
         # Make sure the space is a room
         room = self._room_at(x, y)
         if not room:
             return False
         # Take position from room free positions
-        room.take_position(position)
+        if not room.take_position(position):
+            # If the space isn't free, the crew can't be added there
+            return False
         crew.current_room = room # For the crew interface
         # All is well, add the member
-        self.crew.append(crew)
         crew.position = position
         crew.sprite.position = self.sprite.position+self.room_offset+(position*const.block_size)
+        self.crew.append(crew)
         return True
     
     def draw(self, target):
