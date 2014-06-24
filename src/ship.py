@@ -54,15 +54,15 @@ class Ship:
                 door.sprite.position = self.sprite.position+self.room_offset+(door.pos_b*const.block_size)+sf.Vector2(7, -3)
     
     def add_room(self, room_type, x, y):
-        width, height = const.room_dims[room_type]
+        # Create the room
+        room = Room(room_type, x, y)
+        room.sprite.position = self.sprite.position+sf.Vector2(x*const.block_size, y*const.block_size)+self.room_offset
+
+        width, height = room.width, room.height
         
         # Make sure there's space for the new room
         if self._room_at(x, y, width, height):
             return False
-        
-        # Create the room
-        room = Room(room_type, x, y)
-        room.sprite.position = self.sprite.position+sf.Vector2(x*const.block_size, y*const.block_size)+self.room_offset
 
         # Add doors
         # X axis
