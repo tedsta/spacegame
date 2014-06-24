@@ -37,7 +37,7 @@ class Ship:
             self.add_room(*room_tuple)
         for crew_tuple in crews:
             crew = Crew(*crew_tuple)
-            self.add_crew(crew, crew.position)
+            self.add_crew(crew, crew.position.x, crew.position.y)
 
     def set_position(self, position):
         self.sprite.position = position
@@ -100,13 +100,15 @@ class Ship:
         self.doors.append(door)
         return True
     
-    def add_crew(self, crew, position):
+    def add_crew(self, crew, x, y):
+        position = sf.Vector2(x, y)
+    
         # Make sure space is empty
         for c in self.crew:
             if c.position == position:
                 return False
         # Make sure the space is a room
-        room = self._room_at(position.x, position.y)
+        room = self._room_at(x, y)
         if not room:
             return False
         # Take position from room free positions

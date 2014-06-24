@@ -13,7 +13,7 @@ class Room:
         self.sprite = sf.Sprite(res.room_textures[room_type])
 
         # Crew coordination stuff
-        self.free_positions = [sf.Vector2(x+i, y+j) for i in range(0, self.width) for j in range(0, self.height)]
+        self.free_positions = [sf.Vector2(x+i, y+j) for j in range(0, self.height) for i in range(0, self.width)]
     
     def is_full(self):
         return len(self.free_positions) == 0

@@ -32,11 +32,11 @@ try:
     ship.add_room(const.room2x2, 4, 4)
 
     # Create a crew
-    ship.add_crew(Crew(), sf.Vector2(0, 0))
-    ship.add_crew(Crew(), sf.Vector2(1, 0))
-    ship.add_crew(Crew(), sf.Vector2(0, 1))
-    ship.add_crew(Crew(), sf.Vector2(1, 1))
-    ship.add_crew(Crew(), sf.Vector2(3, 1))
+    ship.add_crew(Crew(), 0, 0)
+    ship.add_crew(Crew(), 1, 0)
+    ship.add_crew(Crew(), 0, 1)
+    ship.add_crew(Crew(), 1, 1)
+    ship.add_crew(Crew(), 3, 1)
     
     # Connect to server
     client = net.Client("localhost", 30000)
