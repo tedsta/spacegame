@@ -66,43 +66,46 @@ class CrewInterface(MouseHandler):
         if button == sf.Mouse.LEFT and self.selecting:
             # Left mouse button released during selection - finish drag selection
             self.selecting = False
+
+            self._update_selections(sf.Vector2(x, y))
             
-            # Find all crew in selection area
-            select_rect = sf.Rectangle(self.rectangle.position, self.rectangle.size)
-            for crew in self.ship.crew:
-                crew_left, crew_top, crew_width, crew_height = crew.sprite.global_bounds
-                crew_rect = sf.Rectangle(sf.Vector2(crew_left, crew_top), sf.Vector2(crew_width, crew_height))
-                if intersects(select_rect, crew_rect):
-                    crew.set_highlighted(True)
-                    self.selected_crew.append(crew)
-                else:
-                    crew.set_highlighted(False)
-    
     def on_mouse_moved(self, position, move):
         if self.selecting:
-            # Set select stop
-            self.select_stop = sf.Vector2(position.x, position.y)
-            
-            # Calculate rectangle
-            left = min(position.x, self.select_start.x)
-            top = min(position.y, self.select_start.y)
-            right = max(position.x, self.select_start.x)
-            bottom = max(position.y, self.select_start.y)
-            
-            # Updating drawing rectangle
-            self.rectangle.position = sf.Vector2(left, top)
-            self.rectangle.size = sf.Vector2(right-left, bottom-top)
-            
-            # Find all crew in selection area
-            select_rect = sf.Rectangle(self.rectangle.position, self.rectangle.size)
-            for crew in self.ship.crew:
-                crew_left, crew_top, crew_width, crew_height = crew.sprite.global_bounds
-                crew_rect = sf.Rectangle(sf.Vector2(crew_left, crew_top), sf.Vector2(crew_width, crew_height))
-                if intersects(select_rect, crew_rect):
-                    crew.set_highlighted(True)
-                else:
-                    crew.set_highlighted(False)
-    
+            self._update_selections(position) 
+
     def draw(self, target):
         if self.selecting:
             target.draw(self.rectangle)
+
+    #############################################
+
+    def _update_selections(self, position):
+        """Updates selected crew.
+        position: Mouse position in pixels
+        """
+        # Set select stop
+        self.select_stop = sf.Vector2(position.x, position.y)
+        
+        # Calculate rectangle
+        left = min(position.x, self.select_start.x)
+        top = min(position.y, self.select_start.y)
+        right = max(position.x, self.select_start.x)
+        bottom = max(position.y, self.select_start.y)
+        
+        # Updating drawing rectangle
+        self.rectangle.position = sf.Vector2(left, top)
+        self.rectangle.size = sf.Vector2(right-left, bottom-top)
+
+        # Clear the selected crew
+        self.selected_crew[:] = []
+        
+        # Find all crew in selection area
+        select_rect = sf.Rectangle(self.rectangle.position, self.rectangle.size)
+        for crew in self.ship.crew:
+            crew_left, crew_top, crew_width, crew_height = crew.sprite.global_bounds
+            crew_rect = sf.Rectangle(sf.Vector2(crew_left, crew_top), sf.Vector2(crew_width, crew_height))
+            if intersects(select_rect, crew_rect):
+                crew.set_highlighted(True)
+                self.selected_crew.append(crew)
+            else:
+                crew.set_highlighted(False)
