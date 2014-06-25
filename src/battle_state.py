@@ -150,11 +150,13 @@ class ClientBattleState(net.Handler):
         packet_id = packet.read()
 
         if packet_id == const.packet_sim_result:
-            paths_dict = packet.read()
-            for crew_id, path in paths_dict.items():
-                self.crew_index[crew_id].path = path
-            self.mode = const.simulate
+            self._handle_simulation_results(packet)
 
+    def _handle_simulation_results(self, packet):
+        paths_dict = packet.read()
+        for crew_id, path in paths_dict.items():
+            self.crew_index[crew_id].path = path
+        self.mode = const.simulate
 
 ###############################################################################
 # Server
