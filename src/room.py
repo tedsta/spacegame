@@ -6,7 +6,8 @@ import src.res as res
 
 class Room:
 
-    def __init__(self, room_type, x, y):
+    def __init__(self, room_type, x, y, id=''):
+        self.id = id
         self.room_type = room_type
         self.position = sf.Vector2(x, y)
         self.width, self.height = const.room_dims[room_type]
@@ -33,4 +34,4 @@ class Room:
             self.free_positions.append(position)
 
     def tuplify(self):
-        return (self.room_type, self.position.x, self.position.y)
+        return (self.room_type, self.position.x, self.position.y, self.id)

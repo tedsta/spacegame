@@ -40,6 +40,7 @@ try:
     
     # Connect to server
     client = net.Client("localhost", 30000)
+    ship.id = client.client_id
 
     # Setup crew IDs
     for i, crew in enumerate(ship.crew):

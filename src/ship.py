@@ -13,6 +13,7 @@ from src.path import WalkDirs
 class Ship:
 
     def __init__(self):
+        self.id = ''
         self.sprite = sf.Sprite(res.ship)
         self.room_offset = sf.Vector2(35, 10) # Offset of room origin
 
@@ -42,9 +43,9 @@ class Ship:
     def set_position(self, position):
         self.sprite.position = position
     
-    def add_room(self, room_type, x, y):
+    def add_room(self, room_type, x, y, id=''):
         # Create the room
-        room = Room(room_type, x, y)
+        room = Room(room_type, x, y, id)
         room.sprite.position = self.sprite.position+sf.Vector2(x*const.block_size, y*const.block_size)+self.room_offset
 
         width, height = room.width, room.height
