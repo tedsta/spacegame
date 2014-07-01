@@ -46,6 +46,8 @@ class Ship:
         self.sprite.position = position
     
     def add_room(self, room_type, x, y, id=''):
+        if not id:
+            id = self.id+"room:"+str(len(self.rooms))
         # Create the room
         room = Room(room_type, x, y, id)
         room.sprite.position = self.sprite.position+sf.Vector2(x*const.block_size, y*const.block_size)+self.room_offset
