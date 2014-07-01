@@ -20,8 +20,11 @@ try:
     # Create the frame rate text
     frame_rate = sf.Text("0", res.font_8bit, 20)
 
+    # Connect to server
+    client = net.Client("localhost", 30000)
+
     # Create a ship
-    ship = Ship()
+    ship = Ship(client.client_id)
     ship.add_room(const.room2x2, 0, 0)
     ship.add_room(const.room2x2, 0, 2)
     ship.add_room(const.room2x2, 0, 4)
@@ -37,10 +40,6 @@ try:
     ship.add_crew(Crew(), 0, 1)
     ship.add_crew(Crew(), 1, 1)
     ship.add_crew(Crew(), 3, 1)
-    
-    # Connect to server
-    client = net.Client("localhost", 30000)
-    ship.id = client.client_id
 
     # Setup crew IDs
     for i, crew in enumerate(ship.crew):

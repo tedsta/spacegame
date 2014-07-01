@@ -12,8 +12,8 @@ from src.path import WalkDirs
 
 class Ship:
 
-    def __init__(self):
-        self.id = ''
+    def __init__(self, id=''):
+        self.id = id
         self.sprite = sf.Sprite(res.ship)
         self.room_offset = sf.Vector2(35, 10) # Offset of room origin
 
@@ -28,10 +28,12 @@ class Ship:
         self.crew = []
 
     def serialize(self, packet):
+        packet.write(self.id)
         packet.write([room.tuplify() for room in self.rooms])
         packet.write([crew.tuplify() for crew in self.crew])
 
     def deserialize(self, packet):
+        self.id = packet.read()
         rooms = packet.read()
         crews = packet.read()
         for room_tuple in rooms: 
