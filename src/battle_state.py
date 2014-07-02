@@ -202,6 +202,20 @@ class ServerBattleState(net.Handler):
         for ship in ships.values():
             for crew in ship.crew:
                 self.crew_index[crew.id] = crew
+
+        # Room index
+        self.room_index = {}
+        for ship in ships.values():
+            for room in ship.rooms:
+                self.room_index[room.id] = room
+        
+        # Weapon index
+        self.weapon_index = {}
+        for ship in ships.values():
+            if not ship.weapon_system:
+                continue
+            for weapon in ship.weapon_system.weapons:
+                self.weapon_index[weapon.id] = weapon
     
     def update(self, dt):
         # Check if all plans have been received for this turn

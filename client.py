@@ -47,6 +47,11 @@ try:
     for i, crew in enumerate(ship.crew):
         crew.id = client.client_id+":crew"+str(i)
 
+    # Setup weapon IDs
+    if ship.weapon_system:
+        for i, weapon in enumerate(ship.weapon_system.weapons):
+            weapon.id = client.client_id+":weap"+str(i)
+
     # Send the server my badass ship
     ship_packet = net.Packet()
     ship.serialize(ship_packet)
