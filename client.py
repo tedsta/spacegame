@@ -9,6 +9,8 @@ from src.input_system import InputSystem
 from src.battle_state import ClientBattleState
 from src.ship import Ship
 from src.crew import Crew
+from src.weapon import Weapon
+from src.weapon_system import WeaponSystem
 
 # create the main window
 window = sf.RenderWindow(sf.VideoMode(800, 480), "Space Game")

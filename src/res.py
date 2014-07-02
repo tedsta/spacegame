@@ -31,6 +31,11 @@ door_h = sf.Texture.from_file("content/textures/rooms/door_h.png")
 door_v = sf.Texture.from_file("content/textures/rooms/door_v.png")
 
 ###################
+# weapons
+
+weapon = sf.Texture.from_file("content/textures/weapons/bomber.png")
+
+###################
 # fonts
 
 font_8bit = sf.Font.from_file("content/fonts/8bit.ttf")

@@ -10,6 +10,9 @@ from src.room import Room
 from src.door import Door
 from src.path import WalkDirs
 
+from src.weapon import Weapon
+from src.weapon_system import WeaponSystem
+
 class Ship:
 
     def __init__(self, id=''):
@@ -20,12 +23,13 @@ class Ship:
         # Path grid for pathfinding
         self.path_grid = Grid(10, 10)
         
-        # Room stuff
+        # Things on the ship
         self.rooms = []
         self.doors = []
-        
-        # Crew stuff
         self.crew = []
+        
+        self.weapon_system = WeaponSystem()
+        self.weapon_system.weapons.append(Weapon(''))
 
     def serialize(self, packet):
         packet.write(self.id)

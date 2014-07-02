@@ -39,6 +39,20 @@ class ClientBattleState(net.Handler):
         for ship in ships.values():
             for crew in ship.crew:
                 self.crew_index[crew.id] = crew
+        
+        # Room index
+        self.room_index = {}
+        for ship in ships.values():
+            for room in ship.rooms:
+                self.room_index[room.id] = room
+        
+        # Weapon index
+        self.weapon_index = {}
+        for ship in ships.values():
+            if not ship.weapon_system:
+                continue
+            for weapon in ship.weapon_system.weapons:
+                self.weapon_index[weapon.id] = weapon
     
     def update(self, dt):
         if self.mode == const.plan:
@@ -89,6 +103,12 @@ class ClientBattleState(net.Handler):
     # Simulate
 
     def simulate(self, dt):
+        # Handle window events
+        for event in self.input.window.events:
+            # close window: exit
+            if type(event) is sf.CloseEvent:
+                self.window.close()
+    
         # Update turn timer
         self.turn_timer += dt
         if self.turn_timer >= const.sim_time:
@@ -174,6 +194,9 @@ class ServerBattleState(net.Handler):
         # Turn stuff
         self.turn_number = 0
         
+        # Simulation events
+        self.simulation_events = []
+        
         # Crew index
         self.crew_index = {}
         for ship in ships.values():
@@ -202,13 +225,24 @@ class ServerBattleState(net.Handler):
             # Handle crew paths
             for crew_id, destination in packet.read().items():
                 self.crew_index[crew_id].destination = sf.Vector2(*destination)
+            # TODO Receive weapon plans
             # Received plans
             self.received_plans[client_id] = True
 
     def apply_simulation(self):
         self.calculate_crew_paths()
 
-        # TODO Weapons
+        # Generate simulation events for weapons
+        # TODO
+        for ship in self.ships.values():
+            if not ship.weapon_system:
+                continue
+            for weapon in ship.weapon_system.weapons:
+                if not weapon.target:
+                    continue
+                self.simulation_events.append((const.sim_event_create_projectile, 0, 0, weapon.id))
+                self.simulation_events.append((const.sim_event_move_projectile, 0, 3, weapon.id+':proj:0', weapon.target.id))
+                self.simulation_events.append((const.sim_event_projectile_hit_room, 3, 0, weapon.id+':proj:0', weapon.target.id))
 
         # Move crew
         for ship in self.ships.values():
@@ -236,5 +270,9 @@ class ServerBattleState(net.Handler):
         for crew in self.crew_index.values():
             crew.destination = None
             crew.path[:] = []
+        # Send simulation events
+        packet.write(self.simulation_events)
+        # Clear simulation events
+        self.simulation_events[:] = []
         # Send results packet
         self.server.broadcast(packet)

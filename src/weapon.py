@@ -4,7 +4,7 @@ class Weapon:
     def __init__(self, id):
         self.id = id
         self.active = False
-        self.target = None
+        self.target = None # Target room
         self.charge = 0
         self.required_charge = 1
         self.power = 1 # Power consumption

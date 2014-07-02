@@ -10,6 +10,10 @@ simulate = 2
 turn_time = 10
 sim_time = 5
 
+sim_event_create_projectile = 0
+sim_event_move_projectile = 1
+sim_event_projectile_hit_room = 2
+
 ###################
 # networking stuff
 
