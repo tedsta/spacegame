@@ -130,7 +130,8 @@ class ClientBattleState(net.Handler):
 
         # Simulate projectiles
         for projectile in self.projectiles:
-            projectile.apply_simulation_time(time)
+            if projectile.active:
+                projectile.apply_simulation_time(time)
                 
     def end_simulation(self):
         for ship in self.ships.values():
@@ -157,6 +158,11 @@ class ClientBattleState(net.Handler):
         # Draw ships
         for ship in self.ships.values():
             ship.draw(target)
+
+        # Draw projectiles
+        for projectile in self.projectiles:
+            if projectile.active:
+                target.draw(projectile.sprite)
         
         # Draw crew interface
         self.crew_interface.draw(target)
