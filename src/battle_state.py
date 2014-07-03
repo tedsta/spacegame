@@ -8,6 +8,7 @@ import src.const as const
 import src.net as net
 from src.crew_interface import CrewInterface
 from src.path import find_path
+from src.projectile import Projectile
 
 class ClientBattleState(net.Handler):
 
@@ -53,6 +54,9 @@ class ClientBattleState(net.Handler):
                 continue
             for weapon in ship.weapon_system.weapons:
                 self.weapon_index[weapon.id] = weapon
+
+        # Projectiles
+        self.projectiles = []
     
     def update(self, dt):
         if self.mode == const.plan:
@@ -119,9 +123,14 @@ class ClientBattleState(net.Handler):
         self.apply_simulation_time(self.turn_timer)
 
     def apply_simulation_time(self, time):
+        # Simulate crew
         for ship in self.ships.values():
             for crew in ship.crew:
                 crew.apply_simulation_time(time)
+
+        # Simulate projectiles
+        for projectile in self.projectiles:
+            projectile.apply_simulation_time(time)
                 
     def end_simulation(self):
         for ship in self.ships.values():
