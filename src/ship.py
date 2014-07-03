@@ -15,7 +15,7 @@ from src.weapon_system import WeaponSystem
 
 class Ship:
 
-    def __init__(self, id=''):
+    def __init__(self, id=""):
         self.id = id
         self.sprite = sf.Sprite(res.ship)
         self.room_offset = sf.Vector2(35, 10) # Offset of room origin
@@ -34,6 +34,10 @@ class Ship:
         packet.write(self.id)
         packet.write([room.tuplify() for room in self.rooms])
         packet.write([crew.tuplify() for crew in self.crew])
+        if self.weapon_system:
+            packet.write(self.weapon_system.tuplify())
+        else:
+            packet.write(None)
 
     def deserialize(self, packet):
         self.id = packet.read()
@@ -44,6 +48,9 @@ class Ship:
         for crew_tuple in crews:
             crew = Crew(*crew_tuple)
             self.add_crew(crew, crew.position.x, crew.position.y)
+        weap_sys_tuple = packet.read()
+        if weap_sys_tuple:
+            self.weapon_system = WeaponSystem(*weap_sys_tuple)
 
     def set_position(self, position):
         self.sprite.position = position
