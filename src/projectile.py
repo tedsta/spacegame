@@ -5,7 +5,7 @@ from src.spritesheet import SpriteSheet
 
 class Projectile:
     def __init__(self):
-        self.sprite = sf.SpriteSheet(res.blue_crew)
+        self.sprite = SpriteSheet(res.blue_crew)
         self.sprite.init(1, 1)
         self.target_room = None
         self.start_position = sf.Vector2(0, 0)
