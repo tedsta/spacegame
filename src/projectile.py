@@ -17,6 +17,3 @@ class Projectile:
 
     def apply_simulation_time(self, time):
         pass
-
-    def tuplify(self):
-        return ()
