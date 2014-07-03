@@ -11,3 +11,6 @@ class Weapon:
         self.projectile_type = None
         self.num_shots = 1
         self.sprite = res.weapon
+
+    def tuplify(self):
+        return (self.id, )

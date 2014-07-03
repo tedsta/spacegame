@@ -27,10 +27,9 @@ class Ship:
         self.rooms = []
         self.doors = []
         self.crew = []
-        
-        self.weapon_system = WeaponSystem()
-        self.weapon_system.weapons.append(Weapon(''))
 
+        self.weapon_system = None
+        
     def serialize(self, packet):
         packet.write(self.id)
         packet.write([room.tuplify() for room in self.rooms])

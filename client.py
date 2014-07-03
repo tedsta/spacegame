@@ -43,6 +43,10 @@ try:
     ship.add_crew(Crew(), 1, 1)
     ship.add_crew(Crew(), 3, 1)
 
+    # Weapons!!!
+    ship.weapon_system = WeaponSystem()
+    ship.weapon_system.weapons.append(Weapon(''))
+
     # Setup crew IDs
     for i, crew in enumerate(ship.crew):
         crew.id = client.client_id+":crew"+str(i)
