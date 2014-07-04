@@ -188,10 +188,15 @@ class ClientBattleState(net.Handler):
             self._handle_simulation_results(packet)
 
     def _handle_simulation_results(self, packet):
+        # Crew paths
         paths_dict = packet.read()
         for crew_id, path in paths_dict.items():
             self.crew_index[crew_id].path = path
         self.mode = const.simulate
+        # Weapon stuff
+        weapon_targets = packet.read()
+        weapon_activations = packet.read()
+        projectile_hits = packet.read()
 
 ###############################################################################
 # Server
@@ -208,9 +213,6 @@ class ServerBattleState(net.Handler):
 
         # Turn stuff
         self.turn_number = 0
-        
-        # Simulation events
-        self.simulation_events = []
         
         # Crew index
         self.crew_index = {}
@@ -261,7 +263,7 @@ class ServerBattleState(net.Handler):
     def apply_simulation(self):
         self.calculate_crew_paths()
 
-        # Generate simulation events for weapons
+        # Do weapons
         # TODO
         for ship in self.ships.values():
             if not ship.weapon_system:
@@ -269,9 +271,8 @@ class ServerBattleState(net.Handler):
             for weapon in ship.weapon_system.weapons:
                 if not weapon.target:
                     continue
-                self.simulation_events.append((const.sim_event_create_projectile, 0, 0, weapon.id))
-                self.simulation_events.append((const.sim_event_move_projectile, 0, 3, weapon.id+':proj:0', weapon.target.id))
-                self.simulation_events.append((const.sim_event_projectile_hit_room, 3, 0, weapon.id+':proj:0', weapon.target.id))
+                for projectile in weapon.projectiles:
+                    projectile.hit = True
 
         # Move crew
         for ship in self.ships.values():
@@ -299,9 +300,22 @@ class ServerBattleState(net.Handler):
         for crew in self.crew_index.values():
             crew.destination = None
             crew.path[:] = []
-        # Send simulation events
-        packet.write(self.simulation_events)
-        # Clear simulation events
-        self.simulation_events[:] = []
+        # Send weapon results
+        weapon_targets = {} # {weap_id : room_id}
+        weapon_activations = {} # {weap_id : bool}
+        projectile_hits = {} # {weap_id : [(proj_index, bool)]}
+        for ship in self.ships.values():
+            if not ship.weapon_system:
+                continue
+            for weapon in ship.weapon_system.weapons:
+                if not weapon.target:
+                    continue
+                weapon_targets[weapon.id] = weapon.target.id
+                weapon_activations[weapon.id] = weapon.active
+                for i, projectile in enumerate(weapon.projectiles):
+                    projectile_hits[weapon.id] = (i, projectile.hit)
+        packet.write(weapon_targets)
+        packet.write(weapon_activations)
+        packet.write(projectile_hits)
         # Send results packet
         self.server.broadcast(packet)

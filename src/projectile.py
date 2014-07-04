@@ -12,7 +12,7 @@ class Projectile:
         self.target_position = sf.Vector2(0, 0)
         self.fire_time = 0
         self.hit_time = 0
-        self.hit = False # Hit or miss?
+        self.hit = True # Hit or miss?
         self.active = False
 
     def apply_simulation_time(self, time):
