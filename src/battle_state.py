@@ -186,17 +186,28 @@ class ClientBattleState(net.Handler):
 
         if packet_id == const.packet_sim_result:
             self._handle_simulation_results(packet)
+            self.mode = const.simulate
 
     def _handle_simulation_results(self, packet):
         # Crew paths
         paths_dict = packet.read()
         for crew_id, path in paths_dict.items():
             self.crew_index[crew_id].path = path
-        self.mode = const.simulate
         # Weapon stuff
         weapon_targets = packet.read()
         weapon_activations = packet.read()
         projectile_hits = packet.read()
+        # Weapon targets
+        for weap_id, target_id in weapon_targets.items():
+            self.weapon_index[weap_id].target = self.room_index[target_id]
+        # Weapon activations
+        for weap_id, active in weapon_activations.items():
+            self.weapon_index[weap_id].active = active
+        # Projectile hits
+        for weap_id, hit_tup in projectile_hits.items():
+            proj_index = hit_tup[0]
+            hit = hit_tup[1]
+            self.weapon_index[weap_id].projectiles[proj_index].hit = hit
 
 ###############################################################################
 # Server
