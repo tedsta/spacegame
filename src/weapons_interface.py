@@ -14,6 +14,8 @@ class WeaponsInterface(MouseHandler):
         self.weapons_targetting = False
     
         """
+        # CAN ONLY TARGET ONE WEAPON AT A TIME
+        # Rectangle.contains() works, but intersects does not.
         # Internal selection stuff
         self.selecting = False
         self.select_start = sf.Vector2(0, 0)
