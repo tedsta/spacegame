@@ -15,6 +15,8 @@ class WeaponsInterface(MouseHandler):
     
         """
         # CAN ONLY TARGET ONE WEAPON AT A TIME
+        # ship has WeaponSystem which has weapons [].
+        # On init, for each weapon in ship.weapon_system.weapons, make a button
         # Rectangle.contains() works, but intersects does not.
         # Internal selection stuff
         self.selecting = False
