@@ -10,20 +10,19 @@ from src.rect import intersects
 class WeaponsInterface(MouseHandler):
 
     def __init__(self, ship):
-        """
-        # Selected crew members
-        self.selected_crew = []
-        
-        # Player ship to select crew from
         self.ship = ship
+        self.weapons_targetting = False
     
+        """
         # Internal selection stuff
         self.selecting = False
         self.select_start = sf.Vector2(0, 0)
         self.select_stop = sf.Vector2(0, 0)
         
+        # In addition, make buttons semi-pretty. For example, highlight the buttons whose weapons are in active. 
+        # Double highlight button if the weapon is in targetting mode. (gray, white, and green are the colors in FTL)
+
         # Draw stuff
-        In addition, make buttons semi-pretty. For example, highlight the buttons whose weapons are in active. Double highlight button if the weapon is in targetting mode. (gray, white, and green are the colors in FTL)
         self.rectangle = sf.RectangleShape()
         self.rectangle.outline_color = sf.Color(0, 255, 0)
         self.rectangle.fill_color = sf.Color(0, 255, 0, 100)
@@ -32,6 +31,27 @@ class WeaponsInterface(MouseHandler):
         pass
     
     def on_mouse_button_pressed(self, button, x, y):
+        if button == sf.Mouse.LEFT:
+            # if self.targetting:
+              # self.targetting = False
+              #  return
+
+            # weapon = clicked_on_weapon_button  #imaginary function that returns weapon clicked on or None
+            # if weapon:
+              # if weapon.active:
+                self.weapons_targetting.append(weapon)
+              # else:
+                # weapon.active = True
+            pass
+        elif button = sf.Mouse.RIGHT:
+            # if self.weapons_targetting:
+              # target_room = clicked_on_enemy_room  #imaginary function that returns room clicked on or None
+              # if target:_room
+                # for weapon in self.weapons_targetting:
+                  # weapon.target = target_room
+                # self.weapons_targetting[:] = []
+            pass
+
         """
         If you left click a deactivated weapon button, the weapon becomes active.
         If you left click an activated weapon button, you enter targetting mode for that weapon.
