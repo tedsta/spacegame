@@ -7,17 +7,18 @@ from src.input_system import MouseHandler
 
 class WeaponsInterface(MouseHandler):
 
+    BUTTON_OFFSET_X = 80
+    BUTTON_OFFSET_Y = 330
+    BUTTON_WIDTH = 30
+    BUTTON_HEIGHT = 30
+
     def __init__(self, ship):
         self.ship = ship
         self.current_weapon = None
-        self.buttons = []
+        self.buttons = [] # Right now they're just sf.Rectangles; maybe they ought to be paired w/weapon
 
-        # eventually Make a button for each weapon
-        # for now just make one
-        button = sf.RectangleShape()
-        button.position = sf.Vector2(100, 100)
-        button.size = sf.Vector2(20, 20)
-        self.buttons.append(button)
+        for weapon in self.ship.weapon_system.weapons:
+            self.add_button(weapon)
 
     
         """
@@ -39,6 +40,15 @@ class WeaponsInterface(MouseHandler):
         self.rectangle.outline_thickness = 2
         """
         pass
+
+    def add_button(self, weapon):
+        x_offset = self.BUTTON_OFFSET_X + (len(self.buttons) * self.BUTTON_WIDTH)
+        next_button_location = sf.Vector2(x_offset, self.BUTTON_OFFSET_Y)
+        button = sf.RectangleShape()
+        button.position = next_button_location
+        button.size = sf.Vector2(self.BUTTON_WIDTH, self.BUTTON_HEIGHT)
+        self.buttons.append(button)
+
     
     def on_mouse_button_pressed(self, button, x, y):
         if button == sf.Mouse.LEFT:

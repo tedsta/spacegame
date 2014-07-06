@@ -46,6 +46,7 @@ try:
     # Weapons!!!
     ship.weapon_system = WeaponSystem()
     ship.weapon_system.weapons.append(Weapon(""))
+    ship.weapon_system.weapons.append(Weapon(""))
 
     # Setup crew IDs
     for i, crew in enumerate(ship.crew):
