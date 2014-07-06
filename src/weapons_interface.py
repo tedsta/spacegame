@@ -11,6 +11,7 @@ class WeaponsInterface(MouseHandler):
     BUTTON_OFFSET_Y = 330
     BUTTON_WIDTH = 30
     BUTTON_HEIGHT = 30
+    BUTTON_RIGHT_MARGIN = 10
 
     def __init__(self, ship):
         self.ship = ship
@@ -42,7 +43,7 @@ class WeaponsInterface(MouseHandler):
         pass
 
     def add_button(self, weapon):
-        x_offset = self.BUTTON_OFFSET_X + (len(self.buttons) * self.BUTTON_WIDTH)
+        x_offset = self.BUTTON_OFFSET_X + (len(self.buttons) * (self.BUTTON_WIDTH + self.BUTTON_RIGHT_MARGIN)) + self.BUTTON_RIGHT_MARGIN
         next_button_location = sf.Vector2(x_offset, self.BUTTON_OFFSET_Y)
         button = sf.RectangleShape()
         button.position = next_button_location
