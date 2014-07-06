@@ -2,16 +2,23 @@
 
 import sfml as sf
 
-import src.const as const
 from src.input_system import MouseHandler
-from src.rect import intersects
 
 
 class WeaponsInterface(MouseHandler):
 
     def __init__(self, ship):
         self.ship = ship
-        self.weapons_targetting = False
+        self.current_weapon = None
+        self.buttons = []
+
+        # eventually Make a button for each weapon
+        # for now just make one
+        button = sf.RectangleShape()
+        button.position = sf.Vector2(100, 100)
+        button.size = sf.Vector2(20, 20)
+        self.buttons.append(button)
+
     
         """
         # CAN ONLY TARGET ONE WEAPON AT A TIME
@@ -26,7 +33,6 @@ class WeaponsInterface(MouseHandler):
         # In addition, make buttons semi-pretty. For example, highlight the buttons whose weapons are in active. 
         # Double highlight button if the weapon is in targetting mode. (gray, white, and green are the colors in FTL)
 
-        # Draw stuff
         self.rectangle = sf.RectangleShape()
         self.rectangle.outline_color = sf.Color(0, 255, 0)
         self.rectangle.fill_color = sf.Color(0, 255, 0, 100)
@@ -43,11 +49,11 @@ class WeaponsInterface(MouseHandler):
             # weapon = clicked_on_weapon_button  #imaginary function that returns weapon clicked on or None
             # if weapon:
               # if weapon.active:
-                self.weapons_targetting.append(weapon)
+                # self.weapons_targetting.append(weapon)
               # else:
                 # weapon.active = True
             pass
-        elif button = sf.Mouse.RIGHT:
+        elif button == sf.Mouse.RIGHT:
             # if self.weapons_targetting:
               # target_room = clicked_on_enemy_room  #imaginary function that returns room clicked on or None
               # if target:_room
@@ -119,11 +125,12 @@ class WeaponsInterface(MouseHandler):
         pass
 
     def draw(self, target):
+        for button in self.buttons:
+            target.draw(button)
         """
         if self.selecting:
             target.draw(self.rectangle)
             """
-        pass
 
     #############################################
 
