@@ -16,4 +16,5 @@ class Projectile:
         self.active = False
 
     def apply_simulation_time(self, time):
-        pass
+        interp = (time - self.fire_time)/(self.hit_time - self.fire_time)
+        self.sprite.position = self.start_position + (self.start_position - self.target_position)*interp

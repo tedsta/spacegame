@@ -47,16 +47,15 @@ class ClientBattleState(net.Handler):
             for room in ship.rooms:
                 self.room_index[room.id] = room
         
-        # Weapon index
+        # Weapon index and projectiles
         self.weapon_index = {}
+        self.projectiles = []
         for ship in ships.values():
             if not ship.weapon_system:
                 continue
             for weapon in ship.weapon_system.weapons:
                 self.weapon_index[weapon.id] = weapon
-
-        # Projectiles
-        self.projectiles = []
+                self.projectiles.extend(weapon.projectiles)
     
     def update(self, dt):
         if self.mode == const.plan:
@@ -128,6 +127,15 @@ class ClientBattleState(net.Handler):
             for crew in ship.crew:
                 crew.apply_simulation_time(time)
 
+        # Simulate weapons
+        for ship in self.ships.values():
+            if not ship.weapon_system:
+                continue
+            for weapon in ship.weapon_system.weapons:
+                if not weapon.firing:
+                    continue
+                weapon.apply_simulation_time(time)
+                
         # Simulate projectiles
         for projectile in self.projectiles:
             if projectile.active:
@@ -194,20 +202,27 @@ class ClientBattleState(net.Handler):
         for crew_id, path in paths_dict.items():
             self.crew_index[crew_id].path = path
         # Weapon stuff
-        weapon_targets = packet.read()
-        weapon_activations = packet.read()
-        projectile_hits = packet.read()
-        # Weapon targets
-        for weap_id, target_id in weapon_targets.items():
+        weapon_info = packet.read() # {weap_id : (target, powered, [(proj_index, hit)])}
+        for weap_id, info in weapon_info.items():
+            target_id = info[0]
+            powered = info[1]
+            proj_hits = info[2]
+            # Weapon targets
             self.weapon_index[weap_id].target = self.room_index[target_id]
-        # Weapon activations
-        for weap_id, active in weapon_activations.items():
-            self.weapon_index[weap_id].active = active
-        # Projectile hits
-        for weap_id, hit_tup in projectile_hits.items():
-            proj_index = hit_tup[0]
-            hit = hit_tup[1]
-            self.weapon_index[weap_id].projectiles[proj_index].hit = hit
+            # Weapon on/off
+            self.weapon_index[weap_id].powered = powered
+            # Projectile hits
+            for hit_tup in proj_hits:
+                proj_index = hit_tup[0]
+                hit = hit_tup[1]
+                weapon = self.weapon_index[weap_id]
+                weapon.firing = True
+                projectile = weapon.projectiles[proj_index]
+                projectile.hit = hit
+                projectile.start_position = weapon.sprite.position
+                projectile.target_position = weapon.target.sprite.position
+                projectile.fire_time = proj_index*0.5 # Fire each projectile half a second after the previous
+                projectile.hit_time = projectile.fire_time+3 # Hit 3 seconds after fire
 
 ###############################################################################
 # Server
@@ -312,21 +327,17 @@ class ServerBattleState(net.Handler):
             crew.destination = None
             crew.path[:] = []
         # Send weapon results
-        weapon_targets = {} # {weap_id : room_id}
-        weapon_activations = {} # {weap_id : bool}
-        projectile_hits = {} # {weap_id : [(proj_index, bool)]}
+        weapon_info = {} # {weap_id : (room_id, bool, [(proj_index, bool)])}
         for ship in self.ships.values():
             if not ship.weapon_system:
                 continue
             for weapon in ship.weapon_system.weapons:
                 if not weapon.target:
                     continue
-                weapon_targets[weapon.id] = weapon.target.id
-                weapon_activations[weapon.id] = weapon.active
+                hits = []
                 for i, projectile in enumerate(weapon.projectiles):
-                    projectile_hits[weapon.id] = (i, projectile.hit)
-        packet.write(weapon_targets)
-        packet.write(weapon_activations)
-        packet.write(projectile_hits)
+                    hits.append((i, projectile.hit))
+                weapon_info[weapon.id] = (weapon.target.id, weapon.powered, hits)
+        packet.write(weapon_info)
         # Send results packet
         self.server.broadcast(packet)
