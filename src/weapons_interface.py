@@ -3,6 +3,7 @@
 import sfml as sf
 
 from src.input_system import MouseHandler
+from src.rect import contains
 
 
 class WeaponsInterface(MouseHandler):
@@ -51,12 +52,17 @@ class WeaponsInterface(MouseHandler):
         self.buttons.append(button)
 
     
-    def on_mouse_button_pressed(self, button, x, y):
-        if button == sf.Mouse.LEFT:
+    def on_mouse_button_pressed(self, mouse_button, x, y):
+        if mouse_button == sf.Mouse.LEFT:
             # if self.targetting:
               # self.targetting = False
               #  return
 
+            for button in self.buttons:
+                if contains(button, sf.Vector2(x, y)):
+                    print("clicked a button. its color is " + str(button.outline_color))
+                    button.outline_thickness = 5
+                    button.outline_color = sf.Color(0, 255, )
             # weapon = clicked_on_weapon_button  #imaginary function that returns weapon clicked on or None
             # if weapon:
               # if weapon.active:
@@ -64,7 +70,7 @@ class WeaponsInterface(MouseHandler):
               # else:
                 # weapon.active = True
             pass
-        elif button == sf.Mouse.RIGHT:
+        elif mouse_button == sf.Mouse.RIGHT:
             # if self.weapons_targetting:
               # target_room = clicked_on_enemy_room  #imaginary function that returns room clicked on or None
               # if target:_room
