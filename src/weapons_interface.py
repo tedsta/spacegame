@@ -60,7 +60,6 @@ class WeaponsInterface(MouseHandler):
 
             for button in self.buttons:
                 if contains(button, sf.Vector2(x, y)):
-                    print("clicked a button. its color is " + str(button.outline_color))
                     button.outline_thickness = 5
                     button.outline_color = sf.Color(0, 255, )
             # weapon = clicked_on_weapon_button  #imaginary function that returns weapon clicked on or None
