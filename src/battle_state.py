@@ -219,6 +219,9 @@ class ClientBattleState(net.Handler):
             self.weapon_index[weap_id].target = self.room_index[target_id]
             # Weapon on/off
             self.weapon_index[weap_id].powered = powered
+            # Weapon is firing if there's any projectile hits
+            if len(proj_hits) > 0:
+                self.weapon_index[weap_id].firing = True
             # Projectile hits
             for hit_tup in proj_hits:
                 proj_index = hit_tup[0]
