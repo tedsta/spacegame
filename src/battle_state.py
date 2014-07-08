@@ -307,7 +307,7 @@ class ServerBattleState(net.Handler):
                 target = info[0]
                 powered = info[1]
                 weapon = self.weapon_index[weap_id]
-                weapon.target = target
+                weapon.target = self.room_index[target]
                 weapon.powered = powered
             # Received plans
             self.received_plans[client_id] = True
