@@ -99,10 +99,8 @@ class ClientBattleState(net.Handler):
         packet.write(crew_destinations)
         # Send weapon poweredness (map weapon ids to bool) and targets
         weapon_info = {}
-        for ship in self.ships.values():
-            if not ship.weapon_system:
-                continue
-            for weapon in ship.weapon_system.weapons:
+        if self.player_ship.weapon_system:
+            for weapon in self.player_ship.weapon_system.weapons:
                 if not weapon.target:
                     continue
                 weapon_info[weapon.id] = (weapon.target.id, weapon.powered)
@@ -303,7 +301,14 @@ class ServerBattleState(net.Handler):
             # Handle crew paths
             for crew_id, destination in packet.read().items():
                 self.crew_index[crew_id].destination = sf.Vector2(*destination)
-            # TODO Receive weapon plans
+            # Receive weapon plans
+            weapon_info = packet.read()
+            for weap_id, info in weapon_info.items():
+                target = info[0]
+                powered = info[1]
+                weapon = self.weapon_index[weap_id]
+                weapon.target = target
+                weapon.powered = powered
             # Received plans
             self.received_plans[client_id] = True
 
