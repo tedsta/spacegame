@@ -97,6 +97,16 @@ class ClientBattleState(net.Handler):
         # Write crew destinations dictionary
         crew_destinations = self._build_crew_destinations_dictionary()
         packet.write(crew_destinations)
+        # Send weapon poweredness (map weapon ids to bool) and targets
+        weapon_info = {}
+        for ship in self.ships.values():
+            if not ship.weapon_system:
+                continue
+            for weapon in ship.weapon_system.weapons:
+                if not weapon.target:
+                    continue
+                weapon_info[weapon.id] = (weapon.target.id, weapon.powered)
+        packet.write(weapon_info)
         # Send to server
         self.client.send(packet)
 
