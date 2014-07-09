@@ -29,6 +29,10 @@ class ClientBattleState(net.Handler):
 
         # Create the weapons interface
         self.weapons_interface = WeaponsInterface(self.player_ship)
+        for client_id, ship in self.ships.items():
+            if client_id != self.client.client_id:
+                self.weapons_interface.add_enemy_ship(ship)
+                print("added enemy ship: " + str(ship))
         self.input.add_mouse_handler(self.weapons_interface)
         
         # Turn stuff
