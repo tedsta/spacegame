@@ -325,6 +325,8 @@ class ServerBattleState(net.Handler):
             if not ship.weapon_system:
                 continue
             for weapon in ship.weapon_system.weapons:
+                if not weapon.powered:
+                    continue
                 if not weapon.target:
                     continue
                 for projectile in weapon.projectiles:
@@ -362,6 +364,8 @@ class ServerBattleState(net.Handler):
             if not ship.weapon_system:
                 continue
             for weapon in ship.weapon_system.weapons:
+                if not weapon.powered:
+                    continue
                 if not weapon.target:
                     continue
                 hits = []
