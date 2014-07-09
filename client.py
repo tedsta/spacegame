@@ -72,8 +72,6 @@ try:
             enemy_ship = Ship()
             enemy_ship.deserialize(packet)
             ships.update({client_id:enemy_ship})
-            ship.weapon_system.weapons[0].target = enemy_ship.rooms[0]
-            ship.weapon_system.weapons[1].target = enemy_ship.rooms[1]
 
     for client_id, other_ship in ships.items():
         if client_id == client.client_id:
