@@ -53,10 +53,10 @@ class WeaponsInterface(MouseHandler):
     def on_mouse_button_pressed(self, mouse_button, x, y):
         ## LEFT CLICK ##
         if mouse_button == sf.Mouse.LEFT:
-            # Left click in targetting mode exits targetting mode
+            # Left click in targeting mode exits targeting mode
             if self.targeted_weapon:
                 self.targeted_weapon = None
-                print("weapon untargetted")
+                print("weapon untargeted")
                 return
 
             # Check to see if clicked on WeaponButton
@@ -65,7 +65,7 @@ class WeaponsInterface(MouseHandler):
                     # TODO change internal color
                     if button.weapon.powered:
                         self.targeted_weapon = button.weapon
-                        print("weapon targetted")
+                        print("weapon targeted")
                         # TODO change color; maybe should store targeted_weapon_button ?
                     else:
                         button.weapon.powered = True
@@ -80,7 +80,7 @@ class WeaponsInterface(MouseHandler):
                         button.weapon.powered = False
                         button.rectangle.outline_thickness = 0
                         return
-            # Check to see if in targetting mode and clicked on a valid enemy room
+            # Check to see if in targeting mode and clicked on a valid enemy room
             if self.targeted_weapon:
                 if not self.enemy_ships:
                     return
@@ -92,6 +92,8 @@ class WeaponsInterface(MouseHandler):
                         if room_rect.contains(sf.Vector2(x, y)):
                             self.targeted_weapon.target = room
                             print("weapon targeted on " + str(room))
+                            self.targeted_weapon = None
+                            print("weapon untargeted")
     
     def on_mouse_button_released(self, button, x, y):
         pass
