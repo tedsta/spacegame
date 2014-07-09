@@ -8,9 +8,9 @@ class Weapon:
         self.sprite = SpriteSheet(res.weapon)
         self.sprite.init(1, 1)
         self.firing = False # Whether or not it's firing this turn
-        self.powered = True # Is the weapon powered or unpowered
+        self.powered = False # Is the weapon powered or unpowered
         self.target = None # Target room
-        self.charge = 1
+        self.charge = 0
         self.required_charge = 1
         self.power = 1 # Power consumption
         self.projectile_type = None
