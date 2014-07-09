@@ -59,6 +59,10 @@ class WeaponsInterface(MouseHandler):
         rectangle = sf.RectangleShape()
         rectangle.position = next_button_location
         rectangle.size = sf.Vector2(self.BUTTON_WIDTH, self.BUTTON_HEIGHT)
+        rectangle.outline_thickness = 0
+        rectangle.outline_color = sf.Color(0, 255, )
+        if weapon.powered:
+            rectangle.outline_thickness = 5
         self.buttons.append(WeaponButton(rectangle, weapon))
 
     
@@ -69,12 +73,16 @@ class WeaponsInterface(MouseHandler):
               #  return
 
             for button in self.buttons:
-                print(button)
                 if contains(button.rectangle, sf.Vector2(x, y)):
-                    print("foo")
-                    button.rectangle.outline_thickness = 5
                     # TODO change internal color
-                    button.rectangle.outline_color = sf.Color(0, 255, )
+                    if button.weapon.powered:
+                        print("targetting stuff")
+                        # targetting stuff
+                        pass
+                    else:
+                        button.weapon.powered = True
+                        button.rectangle.outline_thickness = 5
+
             # weapon = clicked_on_weapon_button  #imaginary function that returns weapon clicked on or None
             # if weapon:
               # if weapon.active:
@@ -83,13 +91,20 @@ class WeaponsInterface(MouseHandler):
                 # weapon.active = True
             pass
         elif mouse_button == sf.Mouse.RIGHT:
+            # Check to see if clicked on a WeaponButton
+            for button in self.buttons:
+                if contains(button.rectangle, sf.Vector2(x, y)):
+                    # TODO change internal color
+                    if button.weapon.powered:
+                        button.weapon.powered = False
+                        button.rectangle.outline_thickness = 0
+
             # if self.weapons_targetting:
               # target_room = clicked_on_enemy_room  #imaginary function that returns room clicked on or None
               # if target:_room
                 # for weapon in self.weapons_targetting:
                   # weapon.target = target_room
                 # self.weapons_targetting[:] = []
-            pass
 
         """
         If you left click a deactivated weapon button, the weapon becomes active.
