@@ -5,6 +5,16 @@ import sfml as sf
 from src.input_system import MouseHandler
 from src.rect import contains
 
+class WeaponButton():
+    def __init__(self, rectangle, weapon):
+        self.rectangle = rectangle
+        self.weapon = weapon
+        self.targetting = False
+
+    def __str__(self):
+        return "WeaponButton for weapon " + str(self.weapon) +\
+                " at rectangle " + str(self.rectangle)
+
 
 class WeaponsInterface(MouseHandler):
 
@@ -17,7 +27,7 @@ class WeaponsInterface(MouseHandler):
     def __init__(self, ship):
         self.ship = ship
         self.current_weapon = None
-        self.buttons = [] # Right now they're just sf.Rectangles; maybe they ought to be paired w/weapon
+        self.buttons = []  # A list of WeaponButton objects
 
         for weapon in self.ship.weapon_system.weapons:
             self.add_button(weapon)
@@ -46,10 +56,10 @@ class WeaponsInterface(MouseHandler):
     def add_button(self, weapon):
         x_offset = self.BUTTON_OFFSET_X + (len(self.buttons) * (self.BUTTON_WIDTH + self.BUTTON_RIGHT_MARGIN)) + self.BUTTON_RIGHT_MARGIN
         next_button_location = sf.Vector2(x_offset, self.BUTTON_OFFSET_Y)
-        button = sf.RectangleShape()
-        button.position = next_button_location
-        button.size = sf.Vector2(self.BUTTON_WIDTH, self.BUTTON_HEIGHT)
-        self.buttons.append(button)
+        rectangle = sf.RectangleShape()
+        rectangle.position = next_button_location
+        rectangle.size = sf.Vector2(self.BUTTON_WIDTH, self.BUTTON_HEIGHT)
+        self.buttons.append(WeaponButton(rectangle, weapon))
 
     
     def on_mouse_button_pressed(self, mouse_button, x, y):
@@ -59,9 +69,12 @@ class WeaponsInterface(MouseHandler):
               #  return
 
             for button in self.buttons:
-                if contains(button, sf.Vector2(x, y)):
-                    button.outline_thickness = 5
-                    button.outline_color = sf.Color(0, 255, )
+                print(button)
+                if contains(button.rectangle, sf.Vector2(x, y)):
+                    print("foo")
+                    button.rectangle.outline_thickness = 5
+                    # TODO change internal color
+                    button.rectangle.outline_color = sf.Color(0, 255, )
             # weapon = clicked_on_weapon_button  #imaginary function that returns weapon clicked on or None
             # if weapon:
               # if weapon.active:
@@ -142,7 +155,7 @@ class WeaponsInterface(MouseHandler):
 
     def draw(self, target):
         for button in self.buttons:
-            target.draw(button)
+            target.draw(button.rectangle)
         """
         if self.selecting:
             target.draw(self.rectangle)
