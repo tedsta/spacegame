@@ -26,6 +26,7 @@ class WeaponsInterface(MouseHandler):
     WEAPON_UNPOWERED_COLOR = sf.Color(255, 255, 255)
     WEAPON_POWERED_COLOR = sf.Color(128, 128, 128)
     WEAPON_TARGETED_COLOR = sf.Color(0, 255, 0)
+    TARGETED_ROOM_OUTLINE_COLOR = sf.Color(255, 255, 0)
 
     def __init__(self, ship):
         self.ship = ship
@@ -33,6 +34,10 @@ class WeaponsInterface(MouseHandler):
         self.current_weapon = None
         self.buttons = []  # A list of WeaponButton objects
         self.targeted_weapon_button = None
+        self.enemy_target = sf.RectangleShape()
+        self.enemy_target.fill_color = sf.Color(0, 0, 0, 0) # transparent
+        self.enemy_target.outline_thickness = 3
+        self.enemy_target.outline_color = sf.Color(0, 0, 0, 0)
 
         for weapon in self.ship.weapon_system.weapons:
             self.add_button(weapon)
@@ -103,9 +108,28 @@ class WeaponsInterface(MouseHandler):
         pass
             
     def on_mouse_moved(self, position, move):
-        pass
+        target_selected = False
+        if self.targeted_weapon_button:
+            for ship in self.enemy_ships:
+                for room in ship.rooms:
+                    room_rect = sf.Rectangle()
+                    room_rect.position = ship.sprite.position+ship.room_offset+(room.position*const.block_size)
+                    room_rect.size = sf.Vector2(room.width*const.block_size, room.height*const.block_size)
+                    if room_rect.contains(position):
+                        target_selected = True
+                        # outline room rect
+                        self.enemy_target.position = room_rect.position
+                        self.enemy_target.size = room_rect.size
+                        self.enemy_target.outline_color = self.TARGETED_ROOM_OUTLINE_COLOR
+        if not target_selected:
+            self.enemy_target.outline_color = sf.Color(0, 0, 0, 0)
+
+                
+
 
     def draw(self, target):
+        if self.enemy_target:
+            target.draw(self.enemy_target)
         for button in self.buttons:
             target.draw(button.rectangle)
 
