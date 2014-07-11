@@ -124,9 +124,6 @@ class WeaponsInterface(MouseHandler):
         if not target_selected:
             self.enemy_target.outline_color = sf.Color(0, 0, 0, 0)
 
-                
-
-
     def draw(self, target):
         if self.enemy_target:
             target.draw(self.enemy_target)
