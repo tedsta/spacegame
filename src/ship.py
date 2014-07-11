@@ -142,6 +142,9 @@ class Ship:
             crew.sprite.position = self.sprite.position+self.room_offset+(crew.position*const.block_size)
         for room in self.rooms:
             room.sprite.position = self.sprite.position+sf.Vector2(room.position.x*const.block_size, room.position.y*const.block_size)+self.room_offset
+        if self.weapon_system:
+            for weapon in self.weapon_system.weapons:
+                weapon.sprite.position = self.sprite.position+weapon.position
         for door in self.doors:
             # Horizontal
             if door.pos_b-door.pos_a == sf.Vector2(1, 0):
@@ -151,6 +154,9 @@ class Ship:
                 door.sprite.position = self.sprite.position+self.room_offset+(door.pos_b*const.block_size)+sf.Vector2(7, -3)
 
         # Draw everything
+        if self.weapon_system:
+            for weapon in self.weapon_system.weapons:
+                target.draw(weapon.sprite)
         target.draw(self.sprite)
         for room in self.rooms:
             target.draw(room.sprite)
