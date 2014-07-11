@@ -23,6 +23,9 @@ class WeaponsInterface(MouseHandler):
     BUTTON_WIDTH = 30
     BUTTON_HEIGHT = 30
     BUTTON_RIGHT_MARGIN = 10
+    WEAPON_UNPOWERED_COLOR = sf.Color(255, 255, 255)
+    WEAPON_POWERED_COLOR = sf.Color(128, 128, 128)
+    WEAPON_TARGETED_COLOR = sf.Color(0, 255, 0)
 
     def __init__(self, ship):
         self.ship = ship
@@ -43,10 +46,9 @@ class WeaponsInterface(MouseHandler):
         rectangle = sf.RectangleShape()
         rectangle.position = next_button_location
         rectangle.size = sf.Vector2(self.BUTTON_WIDTH, self.BUTTON_HEIGHT)
-        rectangle.outline_thickness = 0
-        rectangle.outline_color = sf.Color(0, 255, )
+        rectangle.fill_color = self.WEAPON_UNPOWERED_COLOR
         if weapon.powered:
-            rectangle.outline_thickness = 5
+            rectangle.fill_color = self.WEAPON_POWERED_COLOR
         self.buttons.append(WeaponButton(rectangle, weapon))
 
     
@@ -56,6 +58,7 @@ class WeaponsInterface(MouseHandler):
             # Left click in targeting mode exits targeting mode
             if self.targeted_weapon:
                 self.targeted_weapon = None
+                # TODO self.targeted_weapon_button.fill_color = self.WEAPON_UNPOWERED_COLOR
                 print("weapon untargeted")
                 return
 
@@ -65,11 +68,12 @@ class WeaponsInterface(MouseHandler):
                     # TODO change internal color
                     if button.weapon.powered:
                         self.targeted_weapon = button.weapon
+                        # TODO self.targeted_weapon_button = button
+                        button.rectangle.fill_color = self.WEAPON_TARGETED_COLOR
                         print("weapon targeted")
-                        # TODO change color; maybe should store targeted_weapon_button ?
                     else:
                         button.weapon.powered = True
-                        button.rectangle.outline_thickness = 5
+                        button.rectangle.fill_color = self.WEAPON_POWERED_COLOR
                         
         ## RIGHT CLICK ##
         elif mouse_button == sf.Mouse.RIGHT:
@@ -78,7 +82,7 @@ class WeaponsInterface(MouseHandler):
                 if contains(button.rectangle, sf.Vector2(x, y)):
                     if button.weapon.powered:
                         button.weapon.powered = False
-                        button.rectangle.outline_thickness = 0
+                        button.rectangle.fill_color = self.WEAPON_UNPOWERED_COLOR
                         return
             # Check to see if in targeting mode and clicked on a valid enemy room
             if self.targeted_weapon:
