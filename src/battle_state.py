@@ -247,6 +247,7 @@ class ClientBattleState(net.Handler):
                 weapon = self.weapon_index[weap_id]
                 weapon.firing = True
                 projectile = weapon.projectiles[proj_index]
+                projectile.target_room = self.room_index[target_id]
                 projectile.hit = hit
                 projectile.start_position = weapon.sprite.position
                 projectile.target_position = weapon.target.sprite.position
@@ -337,6 +338,7 @@ class ServerBattleState(net.Handler):
                     continue
                 for projectile in weapon.projectiles:
                     projectile.hit = True
+                    weapon.target.ship.hull_points -= 1
 
         # Move crew
         for ship in self.ships.values():

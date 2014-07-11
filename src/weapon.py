@@ -20,10 +20,13 @@ class Weapon:
         
     def apply_simulation_time(self, time):
         for projectile in self.projectiles:
-            if projectile.active:
-                continue
             if time >= projectile.fire_time:
-                projectile.active = True
+                if projectile.hit and time <= projectile.hit_time:
+                    projectile.active = True
+                else:
+                    if projectile.active:
+                        projectile.target_room.ship.hull_points -= 1
+                    projectile.active = False
 
     def tuplify(self):
         return (self.id, )

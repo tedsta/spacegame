@@ -65,6 +65,7 @@ class Ship:
             id = self.id+"room:"+str(len(self.rooms))
         # Create the room
         room = Room(room_type, x, y, id)
+        room.ship = self
         room.sprite.position = self.sprite.position+sf.Vector2(x*const.block_size, y*const.block_size)+self.room_offset
 
         width, height = room.width, room.height
