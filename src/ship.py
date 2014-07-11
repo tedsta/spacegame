@@ -23,7 +23,7 @@ class Ship:
         self.room_offset = sf.Vector2(35, 10) # Offset of room origin
 
         # Stats n stuff
-        self.hull_points = 50
+        self.hull_points = 10
 
         # Path grid for pathfinding
         self.path_grid = Grid(10, 10)

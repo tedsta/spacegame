@@ -14,6 +14,10 @@ blue_crew_highlighted = sf.Texture.from_file("content/textures/crew/blue_highlig
 
 ship = sf.Texture.from_file("content/textures/ships/ship.png")
 
+ship_hull_point_rect = sf.RectangleShape()
+ship_hull_point_rect.size = (12, 24)
+ship_hull_point_rect.fill_color = sf.Color.GREEN
+
 ###################
 # room stuff
 

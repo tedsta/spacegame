@@ -77,7 +77,7 @@ try:
         if client_id == client.client_id:
             other_ship.set_position(sf.Vector2(50, 50))
         else:
-            other_ship.set_position(sf.Vector2(450, 0))
+            other_ship.set_position(sf.Vector2(450, 100))
     
     # Create the battle state
     battle_state = ClientBattleState(input, client, ships)
