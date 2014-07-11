@@ -17,8 +17,13 @@ class Ship:
 
     def __init__(self, id=""):
         self.id = id
+
+        # Drawing stuff
         self.sprite = sf.Sprite(res.ship)
         self.room_offset = sf.Vector2(35, 10) # Offset of room origin
+
+        # Stats n stuff
+        self.hull_points = 50
 
         # Path grid for pathfinding
         self.path_grid = Grid(10, 10)
