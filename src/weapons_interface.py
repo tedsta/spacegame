@@ -32,7 +32,7 @@ class WeaponsInterface(MouseHandler):
         self.enemy_ships = []
         self.current_weapon = None
         self.buttons = []  # A list of WeaponButton objects
-        self.targeted_weapon = None
+        self.targeted_weapon_button = None
 
         for weapon in self.ship.weapon_system.weapons:
             self.add_button(weapon)
@@ -56,9 +56,9 @@ class WeaponsInterface(MouseHandler):
         ## LEFT CLICK ##
         if mouse_button == sf.Mouse.LEFT:
             # Left click in targeting mode exits targeting mode
-            if self.targeted_weapon:
-                self.targeted_weapon = None
-                # TODO self.targeted_weapon_button.fill_color = self.WEAPON_UNPOWERED_COLOR
+            if self.targeted_weapon_button:
+                self.targeted_weapon_button.rectangle.fill_color = self.WEAPON_POWERED_COLOR
+                self.targeted_weapon_button = None
                 print("weapon untargeted")
                 return
 
@@ -67,8 +67,7 @@ class WeaponsInterface(MouseHandler):
                 if contains(button.rectangle, sf.Vector2(x, y)):
                     # TODO change internal color
                     if button.weapon.powered:
-                        self.targeted_weapon = button.weapon
-                        # TODO self.targeted_weapon_button = button
+                        self.targeted_weapon_button = button
                         button.rectangle.fill_color = self.WEAPON_TARGETED_COLOR
                         print("weapon targeted")
                     else:
@@ -85,7 +84,7 @@ class WeaponsInterface(MouseHandler):
                         button.rectangle.fill_color = self.WEAPON_UNPOWERED_COLOR
                         return
             # Check to see if in targeting mode and clicked on a valid enemy room
-            if self.targeted_weapon:
+            if self.targeted_weapon_button:
                 if not self.enemy_ships:
                     return
                 for ship in self.enemy_ships:
@@ -94,9 +93,10 @@ class WeaponsInterface(MouseHandler):
                         room_rect.position = ship.sprite.position+ship.room_offset+(room.position*const.block_size)
                         room_rect.size = sf.Vector2(room.width*const.block_size, room.height*const.block_size)
                         if room_rect.contains(sf.Vector2(x, y)):
-                            self.targeted_weapon.target = room
+                            self.targeted_weapon_button.weapon.target = room
                             print("weapon targeted on " + str(room))
-                            self.targeted_weapon = None
+                            self.targeted_weapon_button.rectangle.fill_color = self.WEAPON_POWERED_COLOR
+                            self.targeted_weapon_button = None
                             print("weapon untargeted")
     
     def on_mouse_button_released(self, button, x, y):
