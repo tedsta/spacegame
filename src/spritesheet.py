@@ -36,6 +36,7 @@ class SpriteSheet(sf.Sprite):
         self.loop = loop
         self.frame = self.start_frame
         self.time = 0
+        self.set_frame(self.start_frame)
     
     def set_frame(self, frame):
         x = frame%self.frames_per_row

@@ -14,6 +14,8 @@ class Crew:
         self.position = sf.Vector2(x, y) # Position on ship grid
         self.sprite = SpriteSheet(res.blue_crew)
         self.sprite.init(1, 1)
+        #self.sprite.init(117, 9)
+        #self.sprite.set_frame_loop(0, 0, False)
         self.path = []
         self.highlighted = False
         self.destination = None # Plan destination
