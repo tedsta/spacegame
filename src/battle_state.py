@@ -268,7 +268,7 @@ class ClientBattleState(net.Handler):
                 projectile.target_room = self.weapon_index[weap_id].target
                 projectile.hit = hit
                 projectile.start_position = weapon.sprite.position
-                projectile.target_position = weapon.target.sprite.position
+                projectile.target_position = weapon.target.sprite.position+weapon.target.sprite.frame_dim/2
                 projectile.fire_time = proj_index*0.5 # Fire each projectile half a second after the previous
                 projectile.hit_time = projectile.fire_time+3 # Hit 3 seconds after fire
 
