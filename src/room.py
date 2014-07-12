@@ -3,6 +3,7 @@
 import sfml as sf
 import src.const as const
 import src.res as res
+from src.spritesheet import SpriteSheet
 
 class Room:
 
@@ -12,7 +13,8 @@ class Room:
         self.room_type = room_type
         self.position = sf.Vector2(x, y)
         self.width, self.height = const.room_dims[room_type]
-        self.sprite = sf.Sprite(res.room_textures[room_type])
+        self.sprite = SpriteSheet(res.room_textures[room_type])
+        self.sprite.init(1, 1)
 
         # Crew coordination stuff
         self.free_positions = [sf.Vector2(x+i, y+j) for j in reversed(range(0, self.height)) for i in reversed(range(0, self.width))]

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import sfml as sf
 
 class SpriteSheet(sf.Sprite):
@@ -12,6 +10,8 @@ class SpriteSheet(sf.Sprite):
         self.start_frame = 0
         self.stop_frame = frames-1
         self.frame_dim = sf.Vector2(self.texture.width/frames_per_row, self.texture.height/(frames/frames_per_row))
+        self.loop = True
+        self.loop_done = False
         self.set_frame(0)
     
     def update(self, dt):
@@ -19,13 +19,21 @@ class SpriteSheet(sf.Sprite):
         if self.time >= self.frame_delay:         # Enough time has passed to show the next frame
             self.time -= self.frame_delay
             self.frame += 1                        # Increment the frame
-            if self.frame > self.stop_frame:      # Loop back to frame start if we need to
-                self.frame = self.start_frame
+            if self.frame > self.stop_frame:      
+                # Loop back to frame start if we need to
+                if self.loop:
+                    self.frame = self.start_frame
+                else:
+                    self.frame = self.stop_frame
+                    self.loop_done = True
             self.set_frame(self.frame)            # Set the texture rectangle for the frame
     
-    def set_frame_loop(self, start, stop):
+    def set_frame_loop(self, start, stop, loop=True):
+        #if start == self.start_frame and stop == self.stop_frame and loop == self.loop:
+        #    return
         self.start_frame = start
         self.stop_frame = stop
+        self.loop = loop
         self.frame = self.start_frame
         self.time = 0
     

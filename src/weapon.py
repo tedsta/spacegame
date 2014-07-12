@@ -8,7 +8,8 @@ class Weapon:
     def __init__(self, id):
         self.id = id
         self.sprite = SpriteSheet(res.weapon)
-        self.sprite.init(12, 12)
+        self.sprite.init(12, 12, 0.06)
+        self.sprite.set_frame_loop(5, 5, False)
         self.slot = None # WeaponSlot this weapon is in
         self.position = sf.Vector2(0, 0)
         self.firing = False # Whether or not it's firing this turn
@@ -34,6 +35,8 @@ class Weapon:
             for projectile in self.projectiles:
                 if time >= projectile.fire_time:
                     if projectile.hit and time <= projectile.hit_time:
+                        if not projectile.active:
+                            self.sprite.set_frame_loop(5, 11, False)
                         projectile.active = True
                     else:
                         if projectile.active:

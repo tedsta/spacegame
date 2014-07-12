@@ -211,6 +211,21 @@ class Ship:
                y < room.position.y+room.height and y+h > room.position.y:
                 return room
         return None
+
+    def update_sprites(self, dt):
+        # First, update all the sprite positions
+        for crew in self.crew:
+            crew.sprite.update(dt)
+        for room in self.rooms:
+            room.sprite.update(dt)
+        if self.weapon_system:
+            for weapon in self.weapon_system.weapons:
+                weapon.sprite.update(dt)
+                for projectile in weapon.projectiles:
+                    if projectile.active:
+                        projectile.sprite.update(dt)
+        for door in self.doors:
+            door.sprite.update(dt)
     
     def draw(self, target):
         # First, update all the sprite positions

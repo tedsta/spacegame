@@ -141,6 +141,10 @@ class ClientBattleState(net.Handler):
 
         # Apply simulation
         self.apply_simulation_time(self.turn_timer)
+        
+        # Update sprites
+        for ship in self.ships.values():
+            ship.update_sprites(dt)
 
     def apply_simulation_time(self, time):
         # Simulate crew
