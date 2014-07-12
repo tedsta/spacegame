@@ -209,7 +209,7 @@ class ClientBattleState(net.Handler):
         # Draw ship hull points
         for ship in self.ships.values():
             for i in range(0, ship.hull_points):
-                res.ship_hull_point_rect.position = ship.sprite.position + sf.Vector2(2 + i*16, -50)
+                res.ship_hull_point_rect.position = ship.position + sf.Vector2(2 + i*16, -50)
                 target.draw(res.ship_hull_point_rect)
         
         # Draw timer
