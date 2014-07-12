@@ -8,9 +8,9 @@ class Weapon:
     def __init__(self, id):
         self.id = id
         self.sprite = SpriteSheet(res.weapon)
-        self.sprite.init(1, 1)
-        self.slot_position = sf.Vector2(280, 15)
-        self.position = self.slot_position
+        self.sprite.init(12, 12)
+        self.slot = None # WeaponSlot this weapon is in
+        self.position = sf.Vector2(0, 0)
         self.firing = False # Whether or not it's firing this turn
         self.powered = False # Is the weapon powered or unpowered
         self.was_powered = False # Was the weapon powered last turn? (Used for weapon slide out/in animation)
@@ -24,11 +24,11 @@ class Weapon:
         self.projectiles = [Projectile(), Projectile()]
         
     def apply_simulation_time(self, time):
-        if time <= 1: # weapon slide in/out animation
+        if time <= 0.3: # weapon slide in/out animation
             if self.powered and not self.was_powered:
-                self.position = self.slot_position + sf.Vector2(30, 0)*(time/1.0)
+                self.position = self.slot.position + self.slot.powered_offset*(time/0.3)
             if not self.powered and self.was_powered:
-                self.position = self.slot_position+sf.Vector2(30, 0) - sf.Vector2(30, 0)*(time/1.0)
+                self.position = self.slot.position+self.slot.powered_offset - self.slot.powered_offset*(time/0.3)
     
         if self.firing:
             for projectile in self.projectiles:

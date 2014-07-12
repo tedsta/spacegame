@@ -44,10 +44,15 @@ try:
     ship.add_crew(Crew(), 3, 1)
 
     # Weapons!!!
+    ship.add_weapon_slot(360, 80, True, True, "right")
+    ship.add_weapon_slot(360, 120, True, False, "right")
+    ship.add_weapon_slot(230, 29, True, True, "up")
+    ship.add_weapon_slot(300, 294, True, False, "down")
+
     ship.weapon_system = WeaponSystem()
-    ship.weapon_system.weapons.append(Weapon(""))
-    ship.weapon_system.weapons.append(Weapon(""))
-    ship.weapon_system.weapons.append(Weapon(""))
+    ship.add_weapon(Weapon(""))
+    ship.add_weapon(Weapon(""))
+    ship.add_weapon(Weapon(""))
 
     # Setup crew IDs
     for i, crew in enumerate(ship.crew):

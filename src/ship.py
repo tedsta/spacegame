@@ -13,6 +13,51 @@ from src.path import WalkDirs
 from src.weapon import Weapon
 from src.weapon_system import WeaponSystem
 
+class WeaponSlot:
+    def __init__(self, x, y, rotate, mirror, slide_dir, weapon_tup=None):
+        self.position = sf.Vector2(x, y)
+
+        # Rotation
+        if rotate:
+            self.rotation = 90
+        else:
+            self.rotation = 0
+
+        # Mirror?
+        self.scale = sf.Vector2(1, 1)
+        if mirror:
+            if rotate:
+                self.scale.x = -1
+            else:
+                self.scale.y = -1
+
+        # Handle direction
+        self.slide_dir = slide_dir
+        if slide_dir == "left":
+            self.powered_offset = sf.Vector2(-15, 0)
+        elif slide_dir == "right":
+            self.powered_offset = sf.Vector2(15, 0)
+        elif slide_dir == "up":
+            self.powered_offset = sf.Vector2(0, -5)
+        elif slide_dir == "down":
+            self.powered_offset = sf.Vector2(0, 5)
+
+        self.rotate = rotate
+        self.mirror = mirror
+
+        if weapon_tup:
+            self.weapon = Weapon(*weapon_tup)
+            self.weapon.slot = self
+            self.weapon.position = self.position
+        else:
+            self.weapon = None
+
+    def tuplify(self):
+        if self.weapon:
+            return (self.position.x, self.position.y, self.rotate, self.mirror, self.slide_dir, self.weapon.tuplify())
+        else:
+            return (self.position.x, self.position.y, self.rotate, self.mirror, self.slide_dir)
+
 class Ship:
 
     def __init__(self, id=""):
@@ -20,7 +65,9 @@ class Ship:
 
         # Drawing stuff
         self.sprite = sf.Sprite(res.ship)
-        self.room_offset = sf.Vector2(35, 10) # Offset of room origin
+        self.sprite_offset = sf.Vector2(-71, -40)
+        self.room_offset = sf.Vector2(63, 32) # Offset of room origin
+        self.position = sf.Vector2(0, 0)
 
         # Stats n stuff
         self.hull_points = 10
@@ -33,12 +80,15 @@ class Ship:
         self.doors = []
         self.crew = []
 
-        self.weapon_system = None
+        self.weapon_slots = []
         
+        self.weapon_system = None
+
     def serialize(self, packet):
         packet.write(self.id)
         packet.write([room.tuplify() for room in self.rooms])
         packet.write([crew.tuplify() for crew in self.crew])
+        packet.write([slot.tuplify() for slot in self.weapon_slots])
         if self.weapon_system:
             packet.write(self.weapon_system.tuplify())
         else:
@@ -53,12 +103,20 @@ class Ship:
         for crew_tuple in crews:
             crew = Crew(*crew_tuple)
             self.add_crew(crew, crew.position.x, crew.position.y)
+        # Weapon slots
+        weapon_slots = packet.read()
+        for slot in weapon_slots:
+            self.weapon_slots.append(WeaponSlot(*slot))
+        # Weapon system
         weap_sys_tuple = packet.read()
         if weap_sys_tuple:
             self.weapon_system = WeaponSystem(*weap_sys_tuple)
+            for slot in self.weapon_slots:
+                if slot.weapon:
+                    self.weapon_system.weapons.append(slot.weapon)
 
     def set_position(self, position):
-        self.sprite.position = position
+        self.position = position
     
     def add_room(self, room_type, x, y, id=''):
         if not id:
@@ -127,6 +185,24 @@ class Ship:
         crew.sprite.position = self.sprite.position+self.room_offset+(position*const.block_size)
         self.crew.append(crew)
         return True
+
+    def add_weapon_slot(self, x, y, rotate, mirror, slide_dir):
+        self.weapon_slots.append(WeaponSlot(x, y, rotate, mirror, slide_dir))
+
+    def add_weapon(self, weapon):
+        for slot in self.weapon_slots:
+            # Find empty slot
+            if not slot.weapon:
+                slot.weapon = weapon
+                weapon.slot = slot
+                weapon.position = slot.position
+                # Just to make sure it's not powered
+                weapon.was_powered = False
+                weapon.powered = False
+                # Add it to the weapon system
+                self.weapon_system.weapons.append(weapon)
+                return True
+        return False
     
     def room_at(self, x, y, w=1, h=1):
         for room in self.rooms:
@@ -138,13 +214,19 @@ class Ship:
     
     def draw(self, target):
         # First, update all the sprite positions
+        self.sprite.position = self.position+self.sprite_offset
         for crew in self.crew:
             crew.sprite.position = self.sprite.position+self.room_offset+(crew.position*const.block_size)
         for room in self.rooms:
             room.sprite.position = self.sprite.position+sf.Vector2(room.position.x*const.block_size, room.position.y*const.block_size)+self.room_offset
         if self.weapon_system:
             for weapon in self.weapon_system.weapons:
+                weapon.sprite.origin = weapon.sprite.frame_dim/2
                 weapon.sprite.position = self.sprite.position+weapon.position
+                if weapon.slot.rotate:
+                    weapon.sprite.rotation = weapon.slot.rotation
+                if weapon.slot.mirror:
+                    weapon.sprite.ratio = weapon.slot.scale
         for door in self.doors:
             # Horizontal
             if door.pos_b-door.pos_a == sf.Vector2(1, 0):
