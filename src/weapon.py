@@ -34,14 +34,13 @@ class Weapon:
         if self.firing:
             for projectile in self.projectiles:
                 if time >= projectile.fire_time:
-                    if projectile.hit and time <= projectile.hit_time:
+                    if time <= projectile.hit_time:
                         if not projectile.active:
                             self.sprite.set_frame_loop(5, 11, False)
                         projectile.active = True
                     else:
-                        if projectile.active:
-                            projectile.target_room.ship.hull_points -= 1
-                        projectile.active = False
+                        if projectile.hit and projectile.active:
+                            projectile.detonate()
 
     def tuplify(self):
         return (self.id, )

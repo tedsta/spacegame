@@ -28,7 +28,9 @@ class WeaponsInterface(MouseHandler):
     WEAPON_TARGETED_COLOR = sf.Color(0, 255, 0)
     TARGETED_ROOM_OUTLINE_COLOR = sf.Color(255, 255, 0)
 
-    def __init__(self, ship):
+    def __init__(self, lock_window, lock_window_sprite, ship):
+        self.lock_window = lock_window
+        self.lock_window_sprite = lock_window_sprite
         self.ship = ship
         self.enemy_ships = []
         self.current_weapon = None
@@ -97,7 +99,7 @@ class WeaponsInterface(MouseHandler):
                         room_rect = sf.Rectangle()
                         room_rect.position = ship.sprite.position+ship.room_offset+(room.position*const.block_size)
                         room_rect.size = sf.Vector2(room.width*const.block_size, room.height*const.block_size)
-                        if room_rect.contains(sf.Vector2(x, y)):
+                        if room_rect.contains(sf.Vector2(x, y) - self.lock_window_sprite.position):
                             self.targeted_weapon_button.weapon.target = room
                             print("weapon targeted on " + str(room))
                             self.targeted_weapon_button.rectangle.fill_color = self.WEAPON_POWERED_COLOR
@@ -115,7 +117,7 @@ class WeaponsInterface(MouseHandler):
                     room_rect = sf.Rectangle()
                     room_rect.position = ship.sprite.position+ship.room_offset+(room.position*const.block_size)
                     room_rect.size = sf.Vector2(room.width*const.block_size, room.height*const.block_size)
-                    if room_rect.contains(position):
+                    if room_rect.contains(position - self.lock_window_sprite.position):
                         target_selected = True
                         # outline room rect
                         self.enemy_target.position = room_rect.position
@@ -126,7 +128,7 @@ class WeaponsInterface(MouseHandler):
 
     def draw(self, target):
         if self.enemy_target:
-            target.draw(self.enemy_target)
+            self.lock_window.draw(self.enemy_target)
         for button in self.buttons:
             target.draw(button.rectangle)
 

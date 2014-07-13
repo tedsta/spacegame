@@ -224,8 +224,17 @@ class Ship:
                 for projectile in weapon.projectiles:
                     if projectile.active:
                         projectile.sprite.update(dt)
+                    elif projectile.phase == 2: # Phase 2: detonation
+                        projectile.explosion_sprite.update(dt)
+                        if projectile.explosion_sprite.loop_done: # Explosion ended
+                            projectile.phase = 0
         for door in self.doors:
             door.sprite.update(dt)
+    
+    def draw_hull_points(self, target):
+        for i in range(0, self.hull_points):
+            res.ship_hull_point_rect.position = self.position + sf.Vector2(2 + i*16, -50)
+            target.draw(res.ship_hull_point_rect)
     
     def draw(self, target):
         # First, update all the sprite positions

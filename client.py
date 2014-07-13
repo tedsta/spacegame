@@ -13,7 +13,7 @@ from src.weapon import Weapon
 from src.weapon_system import WeaponSystem
 
 # create the main window
-window = sf.RenderWindow(sf.VideoMode(800, 480), "Space Game")
+window = sf.RenderWindow(sf.VideoMode(1024, 768), "Space Game")
 window.key_repeat_enabled = False
 
 input = InputSystem(window)
@@ -82,7 +82,7 @@ try:
         if client_id == client.client_id:
             other_ship.set_position(sf.Vector2(50, 50))
         else:
-            other_ship.set_position(sf.Vector2(450, 100))
+            other_ship.set_position(sf.Vector2(100, 150))
     
     # Create the battle state
     battle_state = ClientBattleState(input, client, ships)

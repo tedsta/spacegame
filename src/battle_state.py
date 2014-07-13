@@ -19,20 +19,27 @@ class ClientBattleState(net.Handler):
 
         client.add_handler(self)
         
+        # Enemy render window
+        self.lock_window = sf.RenderTexture(500, 500)
+        self.lock_window_sprite = sf.Sprite(self.lock_window.texture)
+        self.lock_window_sprite.position = (500, 50)
+        
         # Ships
         self.ships = ships
         self.player_ship = self.ships[self.client.client_id]
+        self.enemy_ship = None
         
         # Create the crew interface
         self.crew_interface = CrewInterface(self.player_ship)
         self.input.add_mouse_handler(self.crew_interface)
 
         # Create the weapons interface
-        self.weapons_interface = WeaponsInterface(self.player_ship)
+        self.weapons_interface = WeaponsInterface(self.lock_window, self.lock_window_sprite, self.player_ship)
         for client_id, ship in self.ships.items():
             if client_id != self.client.client_id:
                 self.weapons_interface.add_enemy_ship(ship)
                 print("added enemy ship: " + str(ship))
+                self.enemy_ship = ship # TODO
         self.input.add_mouse_handler(self.weapons_interface)
         
         # Turn stuff
@@ -65,7 +72,13 @@ class ClientBattleState(net.Handler):
             for weapon in ship.weapon_system.weapons:
                 self.weapon_index[weapon.id] = weapon
                 self.projectiles.extend(weapon.projectiles)
-    
+        
+        # Client ship's projectiles
+        if self.player_ship.weapon_system:
+            for weapon in self.player_ship.weapon_system.weapons:
+                for projectile in weapon.projectiles:
+                    projectile.is_mine = True
+
     def update(self, dt):
         if self.mode == const.plan:
             self.plan(dt)
@@ -191,14 +204,32 @@ class ClientBattleState(net.Handler):
     # Drawing
     
     def draw(self, target):
+        self.lock_window.clear(sf.Color.BLACK)
+    
         # Draw ships
-        for ship in self.ships.values():
-            ship.draw(target)
+        #for ship in self.ships.values():
+        #    ship.draw(target)
+        self.player_ship.draw(target)
+        self.enemy_ship.draw(self.lock_window)
 
         # Draw projectiles
         for projectile in self.projectiles:
             if projectile.active:
-                target.draw(projectile.sprite)
+                if projectile.phase == 0: # Weapon to offscreen
+                    if projectile.is_mine:
+                        target.draw(projectile.sprite)
+                    else:
+                        self.lock_window.draw(projectile.sprite)
+                elif projectile.phase == 1: # Offscreen to target
+                    if projectile.is_mine:
+                        self.lock_window.draw(projectile.sprite)
+                    else:
+                        target.draw(projectile.sprite)
+            elif projectile.phase == 2: # Detonation, but projectile isn't active
+                if projectile.is_mine:
+                    self.lock_window.draw(projectile.explosion_sprite)
+                else:
+                    target.draw(projectile.explosion_sprite)
         
         # Draw crew interface
         self.crew_interface.draw(target)
@@ -207,10 +238,15 @@ class ClientBattleState(net.Handler):
         self.weapons_interface.draw(target)
 
         # Draw ship hull points
-        for ship in self.ships.values():
-            for i in range(0, ship.hull_points):
-                res.ship_hull_point_rect.position = ship.position + sf.Vector2(2 + i*16, -50)
-                target.draw(res.ship_hull_point_rect)
+        #for ship in self.ships.values():
+        #    for i in range(0, ship.hull_points):
+        #        res.ship_hull_point_rect.position = ship.position + sf.Vector2(2 + i*16, -50)
+        #        target.draw(res.ship_hull_point_rect)
+        self.player_ship.draw_hull_points(target)
+        self.enemy_ship.draw_hull_points(self.lock_window)
+                
+        self.lock_window.display()
+        target.draw(self.lock_window_sprite)
         
         # Draw timer
         if self.mode == const.plan:
@@ -267,8 +303,13 @@ class ClientBattleState(net.Handler):
                 projectile = weapon.projectiles[proj_index]
                 projectile.target_room = self.weapon_index[weap_id].target
                 projectile.hit = hit
-                projectile.start_position = weapon.sprite.position
+                projectile.phase = 0
+                # Projectile travel path stuff
+                projectile.start_position = weapon.sprite.position + sf.Vector2(30, 0)
+                projectile.to_offscreen_position = weapon.sprite.position + sf.Vector2(1200, 0)
+                projectile.from_offscreen_position = weapon.sprite.position + sf.Vector2(-100, -100)
                 projectile.target_position = weapon.target.sprite.position+weapon.target.sprite.frame_dim/2
+                # Timing stuff
                 projectile.fire_time = proj_index*0.5 # Fire each projectile half a second after the previous
                 projectile.hit_time = projectile.fire_time+3 # Hit 3 seconds after fire
 

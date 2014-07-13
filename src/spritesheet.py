@@ -34,6 +34,7 @@ class SpriteSheet(sf.Sprite):
         self.start_frame = start
         self.stop_frame = stop
         self.loop = loop
+        self.loop_done = False
         self.frame = self.start_frame
         self.time = 0
         self.set_frame(self.start_frame)

@@ -41,10 +41,15 @@ door_v = sf.Texture.from_file("content/textures/rooms/door_v.png")
 
 weapon = sf.Texture.from_file("content/textures/weapons/laser.png")
 
-##################
+###################
 # Projectiles
 
 laser_light1 = sf.Texture.from_file("content/textures/weapons/laser_light1.png")
+
+###################
+# Effects
+
+explosion_missile1 = sf.Texture.from_file("content/textures/effects/explosion_missile1.png")
 
 ###################
 # fonts
