@@ -1,11 +1,11 @@
 echo "Starting server ..."
-python3.4 server.py &
+python3 server.py &
 sleep 2
 echo "Starting first client ..."
-python3.4 client.py &
+python3 client.py &
 sleep 2
 echo "Starting second client ..."
-python3.4 client.py &
+python3 client.py &
 
 sleep 3
 read -p "Press enter to terminate. " answer
