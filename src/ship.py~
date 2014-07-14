@@ -272,7 +272,7 @@ class Ship:
             target.draw(crew.sprite)
             # Draw crew health bar
             health_bar = sf.RectangleShape()
-            health_bar.position = sf.Vector2(crew.sprite.position.x+7, crew.sprite.position.y-2)
+            health_bar.position = sf.Vector2(crew.sprite.position.x+4, crew.sprite.position.y-2)
             ratio = crew.health/crew.max_health
             health_bar.size = sf.Vector2(20*ratio, 5)
             health_bar.fill_color = sf.Color.GREEN
