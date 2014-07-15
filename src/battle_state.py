@@ -349,17 +349,6 @@ class ServerBattleState(net.Handler):
             for weapon in ship.weapon_system.weapons:
                 self.weapon_index[weapon.id] = weapon
     
-    def update(self, dt):
-        # Check if all plans have been received for this turn
-        if False not in self.received_plans.values():
-            # Send results
-            self.apply_simulation()
-            self.send_simulation_results()
-            # Reset for next turn
-            self.received_plans = {client_id:False for client_id in self.ships.keys()}
-            # Increment turn number
-            self.turn_number += 1
-
     def handle_packet(self, packet, client_id):
         packet_id = packet.read()
 
@@ -385,6 +374,15 @@ class ServerBattleState(net.Handler):
                     self.weapon_index[weap_id].target = None
             # Received plans
             self.received_plans[client_id] = True
+            # Check if all plans have been received for this turn
+            if False not in self.received_plans.values():
+                # Send results
+                self.apply_simulation()
+                self.send_simulation_results()
+                # Reset for next turn
+                self.received_plans = {client_id:False for client_id in self.ships.keys()}
+                # Increment turn number
+                self.turn_number += 1
 
     def apply_simulation(self):
         self.calculate_crew_paths()

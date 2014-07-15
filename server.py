@@ -63,6 +63,3 @@ while True:
 
     # Update the server
     server.update()
-    
-    # Update game state
-    battle_state.update(dt)
