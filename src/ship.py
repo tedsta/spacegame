@@ -71,6 +71,8 @@ class Ship:
         self.position = sf.Vector2(0, 0)
 
         # Stats n stuff
+        self.alive = True
+        self.exploding = False # Playing the explosion animation
         self.hull_points = 10
 
         # Path grid for pathfinding
@@ -214,24 +216,31 @@ class Ship:
                 return room
         return None
 
+    def blow_up(self):
+        self.alive = False
+        self.exploding = True
+
     def update_sprites(self, dt):
-        # First, update all the sprite positions
-        for crew in self.crew:
-            crew.sprite.update(dt)
-        for room in self.rooms:
-            room.sprite.update(dt)
-        if self.weapon_system:
-            for weapon in self.weapon_system.weapons:
-                weapon.sprite.update(dt)
-                for projectile in weapon.projectiles:
-                    if projectile.active:
-                        projectile.sprite.update(dt)
-                    elif projectile.phase == 2: # Phase 2: detonation
-                        projectile.explosion_sprite.update(dt)
-                        if projectile.explosion_sprite.loop_done: # Explosion ended
-                            projectile.phase = 0
-        for door in self.doors:
-            door.sprite.update(dt)
+        if self.alive:
+            # First, update all the sprite positions
+            for crew in self.crew:
+                crew.sprite.update(dt)
+            for room in self.rooms:
+                room.sprite.update(dt)
+            if self.weapon_system:
+                for weapon in self.weapon_system.weapons:
+                    weapon.sprite.update(dt)
+                    for projectile in weapon.projectiles:
+                        if projectile.active:
+                            projectile.sprite.update(dt)
+                        elif projectile.phase == 2: # Phase 2: detonation
+                            projectile.explosion_sprite.update(dt)
+                            if projectile.explosion_sprite.loop_done: # Explosion ended
+                                projectile.phase = 0
+            for door in self.doors:
+                door.sprite.update(dt)
+        else:
+            self.exploding = False
     
     def draw_hull_points(self, target):
         for i in range(0, self.hull_points):
@@ -261,24 +270,27 @@ class Ship:
             elif door.pos_b-door.pos_a == sf.Vector2(0, 1):
                 door.sprite.position = self.sprite.position+self.room_offset+(door.pos_b*const.block_size)+sf.Vector2(7, -3)
 
-        # Draw everything
-        if self.weapon_system:
-            for weapon in self.weapon_system.weapons:
-                target.draw(weapon.sprite)
-        target.draw(self.sprite)
-        for room in self.rooms:
-            target.draw(room.sprite)
-        for door in self.doors:
-            target.draw(door.sprite)
-        for crew in self.crew:
-            target.draw(crew.sprite)
-            # Draw crew health bar
-            health_bar = sf.RectangleShape()
-            health_bar.position = sf.Vector2(crew.sprite.position.x+7, crew.sprite.position.y-2)
-            ratio = crew.health/crew.max_health
-            health_bar.size = sf.Vector2(20*ratio, 5)
-            health_bar.fill_color = sf.Color.GREEN
-            target.draw(health_bar)
+        if self.alive:
+            # Draw everything
+            if self.weapon_system:
+                for weapon in self.weapon_system.weapons:
+                    target.draw(weapon.sprite)
+            target.draw(self.sprite)
+            for room in self.rooms:
+                target.draw(room.sprite)
+            for door in self.doors:
+                target.draw(door.sprite)
+            for crew in self.crew:
+                target.draw(crew.sprite)
+                # Draw crew health bar
+                health_bar = sf.RectangleShape()
+                health_bar.position = sf.Vector2(crew.sprite.position.x+7, crew.sprite.position.y-2)
+                ratio = crew.health/crew.max_health
+                health_bar.size = sf.Vector2(20*ratio, 5)
+                health_bar.fill_color = sf.Color.GREEN
+                target.draw(health_bar)
+        elif self.exploding:
+            pass
 
     ###################################
     # Helper stuff

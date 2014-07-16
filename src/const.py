@@ -6,6 +6,7 @@
 plan = 0
 wait = 1
 simulate = 2
+game_over = 3
 
 turn_time = 10
 sim_time = 5

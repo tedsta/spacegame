@@ -29,6 +29,7 @@ class ClientBattleState(net.Handler):
         self.ships = ships
         self.player_ship = self.ships[self.client.client_id]
         self.enemy_ship = None
+        self.losers = []
         
         # Create the crew interface
         self.crew_interface = CrewInterface(self.player_ship)
@@ -177,6 +178,11 @@ class ClientBattleState(net.Handler):
         for projectile in self.projectiles:
             if projectile.active:
                 projectile.apply_simulation_time(time)
+
+        # See if any ships died
+        for ship in self.ships.values():
+            if ship.hull_points <= 0:
+                ship.blow_up()
                 
     def end_simulation(self):
         for ship in self.ships.values():
@@ -196,10 +202,19 @@ class ClientBattleState(net.Handler):
                 for weapon in ship.weapon_system.weapons:
                     weapon.was_powered = weapon.powered
 
-        # Increment turn
-        self.mode = const.plan
-        self.turn_timer = 0 # Reset turn timer
-        self.turn_number += 1
+        # Check for ship deaths
+        for ship in self.ships.values():
+            if not ship.alive:
+                self.losers.append(ship)
+
+        # Check for game over:
+        if len(self.ships)-len(self.losers) < 2:
+            self.mode = const.game_over
+        else:
+            # Increment turn
+            self.mode = const.plan
+            self.turn_timer = 0 # Reset turn timer
+            self.turn_number += 1
 
     ########################################
     # Drawing
@@ -258,6 +273,15 @@ class ClientBattleState(net.Handler):
             target.draw(self.turn_mode_text)
         elif self.mode == const.simulate:
             self.turn_mode_text.string = "Simulating"
+            target.draw(self.turn_mode_text)
+        elif self.mode == const.game_over:
+            if self.player_ship in self.losers:
+                if len(self.ships)-len(self.losers) > 0:
+                    self.turn_mode_text.string = "You lose"
+                else:
+                    self.turn_mode_text.string = "It's a tie!"
+            else:
+                self.turn_mode_text.string = "You win!"
             target.draw(self.turn_mode_text)
 
     ########################################
@@ -350,17 +374,6 @@ class ServerBattleState(net.Handler):
             for weapon in ship.weapon_system.weapons:
                 self.weapon_index[weapon.id] = weapon
     
-    def update(self, dt):
-        # Check if all plans have been received for this turn
-        if False not in self.received_plans.values():
-            # Send results
-            self.apply_simulation()
-            self.send_simulation_results()
-            # Reset for next turn
-            self.received_plans = {client_id:False for client_id in self.ships.keys()}
-            # Increment turn number
-            self.turn_number += 1
-
     def handle_packet(self, packet, client_id):
         packet_id = packet.read()
 
@@ -386,6 +399,15 @@ class ServerBattleState(net.Handler):
                     self.weapon_index[weap_id].target = None
             # Received plans
             self.received_plans[client_id] = True
+            # Check if all plans have been received for this turn
+            if False not in self.received_plans.values():
+                # Send results
+                self.apply_simulation()
+                self.send_simulation_results()
+                # Reset for next turn
+                self.received_plans = {client_id:False for client_id in self.ships.keys()}
+                # Increment turn number
+                self.turn_number += 1
 
     def apply_simulation(self):
         self.calculate_crew_paths()
