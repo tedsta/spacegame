@@ -6,6 +6,7 @@ export DISPLAY=:5
 echo "Starting server ..."
 python3 server.py &
 
+sleep 1
 read -p "Press enter to terminate. " answer
 
 kill %1
