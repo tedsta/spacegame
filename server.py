@@ -11,9 +11,6 @@ from src.ship import Ship
 from src.crew import Crew
 
 try:
-    # Create the frame rate text
-    frame_rate = sf.Text("0", res.font_8bit, 20)
-
     # Create the server connection
     server = net.Server(30000)
 
@@ -57,7 +54,6 @@ while True:
     frame_accum += 1
     dt_accum += dt
     if dt_accum >= 1:
-        frame_rate.string = str(frame_accum)
         dt_accum = 0
         frame_accum = 0
 
