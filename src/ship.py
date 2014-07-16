@@ -12,6 +12,7 @@ from src.path import WalkDirs
 
 from src.weapon import Weapon
 from src.weapon_system import WeaponSystem
+from src.engine_system import EngineSystem
 
 class WeaponSlot:
     def __init__(self, x, y, rotate, mirror, slide_dir, weapon_tup=None):
@@ -83,6 +84,7 @@ class Ship:
         self.weapon_slots = []
         
         self.weapon_system = None
+        self.engine_system = EngineSystem()
 
     def serialize(self, packet):
         packet.write(self.id)

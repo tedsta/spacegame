@@ -409,6 +409,7 @@ class ServerBattleState(net.Handler):
                                 weapon.target.ship.hull_points -= 1
                             else:
                                 projectile.hit = False
+                                print("miss")
                 else:
                     weapon.firing = False
 
