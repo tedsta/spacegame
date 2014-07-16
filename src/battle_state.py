@@ -421,7 +421,7 @@ class ServerBattleState(net.Handler):
                 if weapon.powered and weapon.target:
                     weapon.firing = True
                     for projectile in weapon.projectiles:
-                        if ship.engine_system.power_used == 0:
+                        if ship.engine_system.power == 0:
                             projectile.hit = True
                             weapon.target.ship.hull_points -= 1
                         else:
