@@ -89,7 +89,7 @@ class Client:
 class Server:
     
     def __init__(self, port):
-        self.host = enet.Host(enet.Address(b"localhost", port), 10, 0, 0, 0)
+        self.host = enet.Host(enet.Address(b"0.0.0.0", port), 10, 0, 0, 0)
         self.peers = {} # Map client IDs to peers
         self.handlers = []
         self.next_client_id = 1

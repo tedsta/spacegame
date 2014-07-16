@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import sys
 import sfml as sf
 
 import src.res as res
@@ -12,6 +13,11 @@ from src.crew import Crew
 from src.weapon import Weapon
 from src.weapon_system import WeaponSystem
 
+# Parse args
+ip_address = "localhost"
+if len(sys.argv) > 1:
+    ip_address = sys.argv[1]
+
 # create the main window
 window = sf.RenderWindow(sf.VideoMode(1024, 768), "Space Game")
 window.key_repeat_enabled = False
@@ -23,7 +29,7 @@ try:
     frame_rate = sf.Text("0", res.font_8bit, 20)
 
     # Connect to server
-    client = net.Client("localhost", 30000)
+    client = net.Client(ip_address, 30000)
 
     # Create a ship
     ship = Ship(client.client_id)
