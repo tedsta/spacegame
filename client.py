@@ -33,8 +33,16 @@ try:
 
     # Create a ship
     ship = Ship(client.client_id)
+    
+    ship.weapon_system = WeaponSystem()
+
+    ship.add_weapon_slot(360, 80, True, True, "right")
+    ship.add_weapon_slot(360, 120, True, False, "right")
+    ship.add_weapon_slot(230, 29, True, True, "up")
+    ship.add_weapon_slot(300, 294, True, False, "down")
+
     ship.add_room(const.room2x2, 0, 0)
-    ship.add_room(const.room2x2, 0, 2)
+    ship.add_room(const.engine_room2x2, 0, 2)
     ship.add_room(const.room2x2, 0, 4)
     ship.add_room(const.room2x1, 2, 3)
     ship.add_room(const.room2x1, 4, 3)
@@ -50,12 +58,6 @@ try:
     ship.add_crew(Crew(), 3, 1)
 
     # Weapons!!!
-    ship.add_weapon_slot(360, 80, True, True, "right")
-    ship.add_weapon_slot(360, 120, True, False, "right")
-    ship.add_weapon_slot(230, 29, True, True, "up")
-    ship.add_weapon_slot(300, 294, True, False, "down")
-
-    ship.weapon_system = WeaponSystem()
     ship.add_weapon(Weapon(""))
     ship.add_weapon(Weapon(""))
     ship.add_weapon(Weapon(""))

@@ -12,6 +12,7 @@ class Projectile:
         self.explosion_sprite = SpriteSheet(res.explosion_missile1)
         self.explosion_sprite.init(9, 9, 0.05)
         self.explosion_sprite.origin = self.explosion_sprite.frame_dim/2
+        self.damage = 1
         self.phase = 0 # 0 = Weapon to offscreen, 1 = offscreen to target, 2 = detonation
         self.target_room = None
         self.start_position = sf.Vector2(0, 0)
@@ -42,7 +43,9 @@ class Projectile:
         self.sprite.position = start_position + (end_position-start_position)*interp
 
     def detonate(self):
-        self.target_room.ship.hull_points -= 1
+        self.target_room.ship.hull_points -= self.damage
+        if self.target_room.system:
+            self.target_room.system.deal_damage(self.damage)
         self.active = False
         self.phase = 2
         self.explosion_sprite.set_frame_loop(0, 8, False)

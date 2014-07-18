@@ -421,14 +421,18 @@ class ServerBattleState(net.Handler):
                 if weapon.powered and weapon.target:
                     weapon.firing = True
                     for projectile in weapon.projectiles:
-                        if ship.engine_system.power == 0:
+                        if weapon.target.ship.engine_system.power == 0:
                             projectile.hit = True
-                            weapon.target.ship.hull_points -= 1
+                            weapon.target.ship.hull_points -= projectile.damage
+                            if weapon.target.system:
+                                weapon.target.system.deal_damage(projectile.damage)
                         else:
                             evade_chance = random.randrange(0, 100)
                             if evade_chance >= 50:
                                 projectile.hit = True
-                                weapon.target.ship.hull_points -= 1
+                                weapon.target.ship.hull_points -= projectile.damage
+                                if weapon.target.system:
+                                    weapon.target.system.deal_damage(projectile.damage)
                             else:
                                 projectile.hit = False
                 else:

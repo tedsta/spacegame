@@ -153,6 +153,10 @@ class Ship:
             # Right side
             if self.room_at(x+width, j):
                 self.add_door(sf.Vector2(x+width-1, j), sf.Vector2(x+width, j))
+
+        # Link room to system
+        if room_type == const.engine_room2x2:
+            room.system = self.engine_system
         
         self.rooms.append(room)
         self._rebuild_path_grid()

@@ -25,6 +25,7 @@ ship_hull_point_rect.fill_color = sf.Color.GREEN
 
 # room textures
 room_textures = [\
+sf.Texture.from_file("content/textures/rooms/weapon2x2.png"),\
 sf.Texture.from_file("content/textures/rooms/2x2.png"),\
 sf.Texture.from_file("content/textures/rooms/2x1.png"),\
 sf.Texture.from_file("content/textures/rooms/1x2.png"),\

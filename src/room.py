@@ -10,6 +10,7 @@ class Room:
     def __init__(self, room_type, x, y, id=''):
         self.id = id
         self.ship = None # The ship that this room belongs to
+        self.system = None # The system this room is associated with
         self.room_type = room_type
         self.position = sf.Vector2(x, y)
         self.width, self.height = const.room_dims[room_type]
