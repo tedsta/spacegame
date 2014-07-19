@@ -25,10 +25,26 @@ ship_hull_point_rect.fill_color = sf.Color.GREEN
 
 # room textures
 room_textures = [\
-sf.Texture.from_file("content/textures/rooms/weapon2x2.png"),\
+sf.Texture.from_file("content/textures/rooms/2x2.png"),\
 sf.Texture.from_file("content/textures/rooms/2x2.png"),\
 sf.Texture.from_file("content/textures/rooms/2x1.png"),\
 sf.Texture.from_file("content/textures/rooms/1x2.png"),\
+]
+
+# room overlays
+room_overlays = [\
+sf.Texture.from_file("content/textures/rooms/room_engines2x2.png"),\
+None,\
+None,\
+None,\
+]
+
+# room icons
+room_icons = [\
+sf.Texture.from_file("content/textures/rooms/icon_engines.png"),\
+None,\
+None,\
+None,\
 ]
 
 ###################

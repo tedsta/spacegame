@@ -42,7 +42,7 @@ try:
     ship.add_weapon_slot(300, 294, True, False, "down")
 
     ship.add_room(const.room2x2, 0, 0)
-    ship.add_room(const.engine_room2x2, 0, 2)
+    ship.add_room(const.room_engines2x2, 0, 2)
     ship.add_room(const.room2x2, 0, 4)
     ship.add_room(const.room2x1, 2, 3)
     ship.add_room(const.room2x1, 4, 3)

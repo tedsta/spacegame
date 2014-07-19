@@ -25,7 +25,7 @@ packet_next_turn = 2
 block_size = 35
 
 # room index ids
-engine_room2x2 = 0
+room_engines2x2 = 0
 room2x2 = 1
 room2x1 = 2
 room1x2 = 3

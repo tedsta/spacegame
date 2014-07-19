@@ -155,8 +155,11 @@ class Ship:
                 self.add_door(sf.Vector2(x+width-1, j), sf.Vector2(x+width, j))
 
         # Link room to system
-        if room_type == const.engine_room2x2:
+        if room_type == const.room_engines2x2:
             room.system = self.engine_system
+
+        # Update sprites
+        room.update_sprites(0)
         
         self.rooms.append(room)
         self._rebuild_path_grid()
@@ -230,7 +233,7 @@ class Ship:
             for crew in self.crew:
                 crew.sprite.update(dt)
             for room in self.rooms:
-                room.sprite.update(dt)
+                room.update_sprites(dt)
             if self.weapon_system:
                 for weapon in self.weapon_system.weapons:
                     weapon.sprite.update(dt)
@@ -257,7 +260,7 @@ class Ship:
         for crew in self.crew:
             crew.sprite.position = self.sprite.position+self.room_offset+(crew.position*const.block_size)
         for room in self.rooms:
-            room.sprite.position = self.sprite.position+sf.Vector2(room.position.x*const.block_size, room.position.y*const.block_size)+self.room_offset
+            room.set_position(self.sprite.position+sf.Vector2(room.position.x*const.block_size, room.position.y*const.block_size)+self.room_offset)
         if self.weapon_system:
             for weapon in self.weapon_system.weapons:
                 weapon.sprite.origin = weapon.sprite.frame_dim/2
@@ -281,7 +284,7 @@ class Ship:
                     target.draw(weapon.sprite)
             target.draw(self.sprite)
             for room in self.rooms:
-                target.draw(room.sprite)
+                room.draw(target)
             for door in self.doors:
                 target.draw(door.sprite)
             for crew in self.crew:

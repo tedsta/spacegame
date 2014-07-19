@@ -333,7 +333,7 @@ class ClientBattleState(net.Handler):
                 projectile.start_position = weapon.sprite.position + sf.Vector2(30, 0)
                 projectile.to_offscreen_position = weapon.sprite.position + sf.Vector2(1200, 0)
                 projectile.from_offscreen_position = weapon.sprite.position + sf.Vector2(-100, -100)
-                projectile.target_position = weapon.target.sprite.position+weapon.target.sprite.frame_dim/2
+                projectile.target_position = weapon.target.sprite.position+weapon.target.sprite.global_bounds.size/2
                 # Timing stuff
                 projectile.fire_time = proj_index*0.5 # Fire each projectile half a second after the previous
                 projectile.hit_time = projectile.fire_time+3 # Hit 3 seconds after fire
