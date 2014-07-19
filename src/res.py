@@ -10,6 +10,7 @@ blue_crew = sf.Texture.from_file("content/textures/crew/blue.png")
 blue_crew_highlighted = sf.Texture.from_file("content/textures/crew/blue_highlighted.png")
 
 human_base = sf.Texture.from_file("content/textures/crew/human_base.png")
+human_color = sf.Texture.from_file("content/textures/crew/human_color.png")
 
 ###################
 # ship stuff

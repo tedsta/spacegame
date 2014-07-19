@@ -29,17 +29,18 @@ class SpriteSheet(sf.Sprite):
             self.set_frame(self.frame)            # Set the texture rectangle for the frame
     
     def set_frame_loop(self, start, stop, loop=True):
-        #if start == self.start_frame and stop == self.stop_frame and loop == self.loop:
-        #    return
+        if start == self.start_frame and stop == self.stop_frame and (not loop or loop == self.loop):
+            return
         self.start_frame = start
         self.stop_frame = stop
         self.loop = loop
         self.loop_done = False
         self.frame = self.start_frame
+        self.set_frame(self.frame)
         self.time = 0
-        self.set_frame(self.start_frame)
     
     def set_frame(self, frame):
         x = frame%self.frames_per_row
         y = frame//self.frames_per_row
-        self.texture_rectangle = sf.Rectangle((x*self.frame_dim.x, y*self.frame_dim.y), self.frame_dim)
+        position = sf.Vector2(x*self.frame_dim.x, y*self.frame_dim.y)
+        self.texture_rectangle = sf.Rectangle(position, self.frame_dim)

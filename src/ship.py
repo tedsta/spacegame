@@ -290,7 +290,7 @@ class Ship:
             for door in self.doors:
                 target.draw(door.sprite)
             for crew in self.crew:
-                target.draw(crew.sprite)
+                crew.draw(target)
                 # Draw crew health bar
                 health_bar = sf.RectangleShape()
                 health_bar.position = sf.Vector2(crew.sprite.position.x+7, crew.sprite.position.y-2)
