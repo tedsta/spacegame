@@ -47,7 +47,7 @@ try:
     ship.add_room(const.room2x1, 2, 3)
     ship.add_room(const.room2x1, 4, 3)
     ship.add_room(const.room2x1, 2, 5)
-    ship.add_room(const.room2x2, 3, 1)
+    ship.add_room(const.room_weapons2x2, 3, 1)
     ship.add_room(const.room2x2, 4, 4)
 
     # Create a crew

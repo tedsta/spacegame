@@ -41,7 +41,7 @@ class Room:
             if self.system.damage == 0:
                 self.icon_sprite.color = sf.Color(120, 120, 120, 255)
             elif self.system.damage < self.system.max_power:
-                self.icon_sprite.color = sf.Color(200, 200, 50, 255)
+                self.icon_sprite.color = sf.Color(255, 120, 50, 255)
             elif self.system.damage == self.system.max_power:
                 self.icon_sprite.color = sf.Color(255, 0, 0, 255)
 

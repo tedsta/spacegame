@@ -90,23 +90,16 @@ class Ship:
 
     def serialize(self, packet):
         packet.write(self.id)
-        packet.write([room.tuplify() for room in self.rooms])
-        packet.write([crew.tuplify() for crew in self.crew])
         packet.write([slot.tuplify() for slot in self.weapon_slots])
         if self.weapon_system:
             packet.write(self.weapon_system.tuplify())
         else:
             packet.write(None)
+        packet.write([room.tuplify() for room in self.rooms])
+        packet.write([crew.tuplify() for crew in self.crew])
 
     def deserialize(self, packet):
         self.id = packet.read()
-        rooms = packet.read()
-        crews = packet.read()
-        for room_tuple in rooms: 
-            self.add_room(*room_tuple)
-        for crew_tuple in crews:
-            crew = Crew(*crew_tuple)
-            self.add_crew(crew, crew.position.x, crew.position.y)
         # Weapon slots
         weapon_slots = packet.read()
         for slot in weapon_slots:
@@ -118,6 +111,13 @@ class Ship:
             for slot in self.weapon_slots:
                 if slot.weapon:
                     self.weapon_system.weapons.append(slot.weapon)
+        rooms = packet.read()
+        for room_tuple in rooms: 
+            self.add_room(*room_tuple)
+        crews = packet.read()
+        for crew_tuple in crews:
+            crew = Crew(*crew_tuple)
+            self.add_crew(crew, crew.position.x, crew.position.y)
 
     def set_position(self, position):
         self.position = position
@@ -157,6 +157,8 @@ class Ship:
         # Link room to system
         if room_type == const.room_engines2x2:
             room.system = self.engine_system
+        elif room_type == const.room_weapons2x2:
+            room.system = self.weapon_system
 
         # Update sprites
         room.update_sprites(0)

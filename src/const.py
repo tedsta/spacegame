@@ -25,15 +25,19 @@ packet_next_turn = 2
 block_size = 35
 
 # room index ids
-room_engines2x2 = 0
-room2x2 = 1
-room2x1 = 2
-room1x2 = 3
+room2x2 = 0
+room2x1 = 1
+room1x2 = 2
+room_pilot1x2 = 3
+room_engines2x2 = 4
+room_weapons2x2 = 5
 
 # room dimensions
 room_dims = [\
 (2,2),\
-(2,2),\
 (2,1),\
 (1,2),\
+(1,2),\
+(2,2),\
+(2,2),\
 ]
