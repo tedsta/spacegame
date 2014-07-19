@@ -14,10 +14,10 @@ class Crew:
         self.position = sf.Vector2(x, y) # Position on ship grid
         self.sprite = SpriteSheet(res.human_base)
         self.sprite.init(117, 9)
-        self.sprite.set_frame_loop(0, 1, False)
+        self.sprite.set_frame_loop(0, 0, False)
         self.highlight_sprite = SpriteSheet(res.human_color)
         self.highlight_sprite.init(117, 9)
-        self.highlight_sprite.set_frame_loop(0, 1, False)
+        self.highlight_sprite.set_frame_loop(0, 0, False)
         self.highlight_sprite.color = sf.Color(0, 255, 0, 255)
         
         self.path = []
