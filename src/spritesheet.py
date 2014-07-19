@@ -29,7 +29,7 @@ class SpriteSheet(sf.Sprite):
             self.set_frame(self.frame)            # Set the texture rectangle for the frame
     
     def set_frame_loop(self, start, stop, loop=True):
-        if start == self.start_frame and stop == self.stop_frame and (not loop or loop == self.loop):
+        if start == self.start_frame and stop == self.stop_frame and self.loop and loop == self.loop:
             return
         self.start_frame = start
         self.stop_frame = stop
