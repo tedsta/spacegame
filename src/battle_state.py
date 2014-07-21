@@ -9,6 +9,7 @@ import src.const as const
 import src.net as net
 from src.crew_interface import CrewInterface
 from src.weapons_interface import WeaponsInterface
+from src.systems_interface import SystemsInterface
 from src.path import find_path
 from src.projectile import Projectile
 
@@ -34,6 +35,10 @@ class ClientBattleState(net.Handler):
         # Create the crew interface
         self.crew_interface = CrewInterface(self.player_ship)
         self.input.add_mouse_handler(self.crew_interface)
+        
+        # Create the systems interface
+        self.systems_interface = SystemsInterface(self.player_ship)
+        self.input.add_mouse_handler(self.systems_interface)
 
         # Create the weapons interface
         self.weapons_interface = WeaponsInterface(self.lock_window, self.lock_window_sprite, self.player_ship)
@@ -249,6 +254,9 @@ class ClientBattleState(net.Handler):
         
         # Draw crew interface
         self.crew_interface.draw(target)
+        
+        # Draw systems interface
+        self.systems_interface.draw(target)
 
         # Draw weapons interface
         self.weapons_interface.draw(target)
