@@ -121,6 +121,10 @@ class ClientBattleState(net.Handler):
         # Write crew destinations dictionary
         crew_destinations = self._build_crew_destinations_dictionary()
         packet.write(crew_destinations)
+        # Send system poweredness
+        # TODO
+        packet.write(self.player_ship.engine_system.power)
+        packet.write(self.player_ship.weapon_system.power)
         # Send weapon poweredness (map weapon ids to bool) and targets
         weapon_powered = {} # {weap_id : room_id}
         weapon_targets = {} # {weap_id : bool}
@@ -390,9 +394,13 @@ class ServerBattleState(net.Handler):
             turn_number = packet.read()
             if turn_number != self.turn_number:
                 return
+            ship = self.ships[client_id]
             # Handle crew paths
             for crew_id, destination in packet.read().items():
                 self.crew_index[crew_id].destination = sf.Vector2(*destination)
+            # Receive system poweredness
+            ship.engine_system.power = packet.read()
+            ship.weapon_system.power = packet.read()
             # Receive weapon plans
             weapon_powered = packet.read() # {weap_id : room_id}
             weapon_targets = packet.read() # {weap_id : bool}
