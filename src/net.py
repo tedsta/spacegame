@@ -59,7 +59,7 @@ class Client:
         self.handlers = []
     
     def send(self, packet):
-        self.peer.send(0, enet.Packet(packet.to_bytes()))
+        self.peer.send(0, enet.Packet(packet.to_bytes(), enet.PACKET_FLAG_RELIABLE))
 
     def add_handler(self, handler):
         self.handlers.append(handler)
@@ -95,10 +95,10 @@ class Server:
         self.next_client_id = 1
 
     def broadcast(self, packet):
-        self.host.broadcast(0, enet.Packet(packet.to_bytes()))
+        self.host.broadcast(0, enet.Packet(packet.to_bytes(), enet.PACKET_FLAG_RELIABLE))
 
     def send(self, client_id, packet):
-        self.peers[client_id].send(0, enet.Packet(packet.to_bytes()))
+        self.peers[client_id].send(0, enet.Packet(packet.to_bytes(), enet.PACKET_FLAG_RELIABLE))
 
     def add_handler(self, handler):
         self.handlers.append(handler)
@@ -114,7 +114,7 @@ class Server:
             if event.type == enet.EVENT_TYPE_CONNECT:
                 print("Client "+str(client_id)+" connected from " + str(event.peer.address))
                 # Send client ID
-                event.peer.send(0, enet.Packet(pickle.dumps(client_id)))
+                event.peer.send(0, enet.Packet(pickle.dumps(client_id), enet.PACKET_FLAG_RELIABLE))
                 # Handle connection
                 self.peers[client_id] = event.peer
                 for handler in self.handlers:
