@@ -19,8 +19,7 @@ class SystemsInterface(MouseHandler):
     BUTTON_WIDTH = 64
     BUTTON_HEIGHT = 48
     BUTTON_RIGHT_MARGIN = 10
-    SYSTEM_UNPOWERED_COLOR = sf.Color(255, 255, 255)
-    SYSTEM_POWERED_COLOR = sf.Color(128, 128, 128)
+    SYSTEM_BUTTON_COLOR = sf.Color(128, 128, 128)
     BAR_POWERED_COLOR = sf.Color(100, 255, 100)
 
     def __init__(self, ship):
@@ -28,8 +27,9 @@ class SystemsInterface(MouseHandler):
         self.buttons = []  # A list of SystemButton objects
         
         self.unpowered_bar = sf.RectangleShape()
+        self.unpowered_bar.size = sf.Vector2(32, 8)
         self.unpowered_bar.fill_color = sf.Color(0, 0, 0, 0)
-        self.unpowered_bar.outline_thickness = 2
+        self.unpowered_bar.outline_thickness = 1
         self.unpowered_bar.outline_color = sf.Color(255, 255, 255, 255)
         
         self.powered_bar = sf.RectangleShape()
@@ -47,9 +47,7 @@ class SystemsInterface(MouseHandler):
         rectangle = sf.RectangleShape()
         rectangle.position = next_button_location
         rectangle.size = sf.Vector2(self.BUTTON_WIDTH, self.BUTTON_HEIGHT)
-        rectangle.fill_color = self.SYSTEM_UNPOWERED_COLOR
-        if system.power > 0:
-            rectangle.fill_color = self.SYSTEM_POWERED_COLOR
+        rectangle.fill_color = self.SYSTEM_BUTTON_COLOR
         self.buttons.append(SystemButton(rectangle, system))
 
     
@@ -80,10 +78,6 @@ class SystemsInterface(MouseHandler):
 
     def draw(self, target):
         for button in self.buttons:
-            if button.system.power > 0:
-                button.rectangle.fill_color = self.SYSTEM_POWERED_COLOR
-            else:
-                button.rectangle.fill_color = self.SYSTEM_UNPOWERED_COLOR
             target.draw(button.rectangle)
             for i in range(0, button.system.max_power):
                 if i < button.system.power:
