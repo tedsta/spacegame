@@ -10,13 +10,17 @@ class Weapon:
         self.sprite = SpriteSheet(res.weapon)
         self.sprite.init(12, 12, 0.06)
         self.sprite.set_frame_loop(5, 5, False)
+
         self.slot = None # WeaponSlot this weapon is in
         self.position = sf.Vector2(0, 0)
+
         self.firing = False # Whether or not it's firing this turn
         self.powered = False # Is the weapon powered or unpowered
         self.was_powered = False # Was the weapon powered last turn? (Used for weapon slide out/in animation)
         self.target = None # Target room
+
         self.charge = 0
+
         self.required_charge = 1
         self.required_power = 1 # Power consumption
         self.projectile_type = None
