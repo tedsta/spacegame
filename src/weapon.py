@@ -18,7 +18,7 @@ class Weapon:
         self.target = None # Target room
         self.charge = 0
         self.required_charge = 1
-        self.power = 1 # Power consumption
+        self.required_power = 1 # Power consumption
         self.projectile_type = None
         self.num_shots = 2
 

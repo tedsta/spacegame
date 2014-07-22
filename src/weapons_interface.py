@@ -24,14 +24,17 @@ class WeaponsInterface(MouseHandler):
     BUTTON_HEIGHT = 30
     BUTTON_RIGHT_MARGIN = 10
     WEAPON_UNPOWERED_COLOR = sf.Color(255, 255, 255)
+    WEAPON_UNPOWERED_TARGETED_COLOR = sf.Color(120, 0, 0)
     WEAPON_POWERED_COLOR = sf.Color(128, 128, 128)
-    WEAPON_TARGETED_COLOR = sf.Color(0, 255, 0)
+    WEAPON_POWERED_TARGETED_COLOR = sf.Color(255, 0, 0)
+    WEAPON_TARGETING_COLOR = sf.Color(0, 255, 0)
     TARGETED_ROOM_OUTLINE_COLOR = sf.Color(255, 255, 0)
 
     def __init__(self, lock_window, lock_window_sprite, ship):
         self.lock_window = lock_window
         self.lock_window_sprite = lock_window_sprite
         self.ship = ship
+        self.weapon_system = ship.weapon_system
         self.enemy_ships = []
         self.current_weapon = None
         self.buttons = []  # A list of WeaponButton objects
@@ -53,9 +56,6 @@ class WeaponsInterface(MouseHandler):
         rectangle = sf.RectangleShape()
         rectangle.position = next_button_location
         rectangle.size = sf.Vector2(self.BUTTON_WIDTH, self.BUTTON_HEIGHT)
-        rectangle.fill_color = self.WEAPON_UNPOWERED_COLOR
-        if weapon.powered:
-            rectangle.fill_color = self.WEAPON_POWERED_COLOR
         self.buttons.append(WeaponButton(rectangle, weapon))
 
     
@@ -64,7 +64,6 @@ class WeaponsInterface(MouseHandler):
         if mouse_button == sf.Mouse.LEFT:
             # Left click in targeting mode exits targeting mode
             if self.targeted_weapon_button:
-                self.targeted_weapon_button.rectangle.fill_color = self.WEAPON_POWERED_COLOR
                 self.targeted_weapon_button = None
                 print("weapon untargeted")
                 return
@@ -75,11 +74,9 @@ class WeaponsInterface(MouseHandler):
                     # TODO change internal color
                     if button.weapon.powered:
                         self.targeted_weapon_button = button
-                        button.rectangle.fill_color = self.WEAPON_TARGETED_COLOR
                         print("weapon targeted")
                     else:
-                        button.weapon.powered = True
-                        button.rectangle.fill_color = self.WEAPON_POWERED_COLOR
+                        self.weapon_system.try_power_weapon(button.weapon)
                         
         ## RIGHT CLICK ##
         elif mouse_button == sf.Mouse.RIGHT:
@@ -87,8 +84,7 @@ class WeaponsInterface(MouseHandler):
             for button in self.buttons:
                 if contains(button.rectangle, sf.Vector2(x, y)):
                     if button.weapon.powered:
-                        button.weapon.powered = False
-                        button.rectangle.fill_color = self.WEAPON_UNPOWERED_COLOR
+                        self.weapon_system.depower_weapon(button.weapon)
                         return
             # Check to see if in targeting mode and clicked on a valid enemy room
             if self.targeted_weapon_button:
@@ -102,7 +98,6 @@ class WeaponsInterface(MouseHandler):
                         if room_rect.contains(sf.Vector2(x, y) - self.lock_window_sprite.position):
                             self.targeted_weapon_button.weapon.target = room
                             print("weapon targeted on " + str(room))
-                            self.targeted_weapon_button.rectangle.fill_color = self.WEAPON_POWERED_COLOR
                             self.targeted_weapon_button = None
                             print("weapon untargeted")
     
@@ -130,6 +125,18 @@ class WeaponsInterface(MouseHandler):
         if self.enemy_target:
             self.lock_window.draw(self.enemy_target)
         for button in self.buttons:
+            if button is self.targeted_weapon_button:
+                self.targeted_weapon_button.rectangle.fill_color = self.WEAPON_TARGETING_COLOR
+            elif button.weapon.powered:
+                if button.weapon.target:
+                    button.rectangle.fill_color = self.WEAPON_POWERED_TARGETED_COLOR
+                else:
+                    button.rectangle.fill_color = self.WEAPON_POWERED_COLOR
+            else:
+                if button.weapon.target:
+                    button.rectangle.fill_color = self.WEAPON_UNPOWERED_TARGETED_COLOR
+                else:
+                    button.rectangle.fill_color = self.WEAPON_UNPOWERED_COLOR
             target.draw(button.rectangle)
 
 
