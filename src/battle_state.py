@@ -436,18 +436,18 @@ class ServerBattleState(net.Handler):
             # Check if all plans have been received for this turn
             if False not in self.received_plans.values():
                 # Send results
-                self.apply_simulation()
+                self.prepare_simulation()
                 self.send_simulation_results()
+                self.end_simulation()
                 # Reset for next turn
                 self.received_plans = {client_id:False for client_id in self.ships.keys()}
                 # Increment turn number
                 self.turn_number += 1
 
-    def apply_simulation(self):
+    def prepare_simulation(self):
         self.calculate_crew_paths()
 
         # Do weapons
-        # TODO
         for ship in self.ships.values():
             if not ship.weapon_system:
                 continue
@@ -457,16 +457,10 @@ class ServerBattleState(net.Handler):
                     for projectile in weapon.projectiles:
                         if weapon.target.ship.engine_system.power == 0:
                             projectile.hit = True
-                            weapon.target.ship.hull_points -= projectile.damage
-                            if weapon.target.system:
-                                weapon.target.system.deal_damage(projectile.damage)
                         else:
                             evade_chance = random.randrange(0, 100)
                             if evade_chance >= 50:
                                 projectile.hit = True
-                                weapon.target.ship.hull_points -= projectile.damage
-                                if weapon.target.system:
-                                    weapon.target.system.deal_damage(projectile.damage)
                             else:
                                 projectile.hit = False
                 else:
@@ -494,10 +488,6 @@ class ServerBattleState(net.Handler):
         for crew in self.crew_index.values():
             paths_dict[crew.id] = crew.path
         packet.write(paths_dict)
-        # Clear crew paths for next turn
-        for crew in self.crew_index.values():
-            crew.destination = None
-            crew.path[:] = []
         # Send weapon results
         weapon_powered = {} # {weap_id : room_id}
         weapon_targets = {} # {weap_id : bool}
@@ -521,3 +511,21 @@ class ServerBattleState(net.Handler):
         packet.write(projectile_hits)
         # Send results packet
         self.server.broadcast(packet)
+
+    def end_simulation(self):
+        # Clear crew paths for next turn
+        for crew in self.crew_index.values():
+            crew.destination = None
+            crew.path[:] = []
+
+        # Deal projectile damage
+        for ship in self.ships.values():
+            if not ship.weapon_system:
+                continue
+            for weapon in ship.weapon_system.weapons:
+                if weapon.firing:
+                    for projectile in weapon.projectiles:
+                        if projectile.hit:
+                            weapon.target.ship.hull_points -= projectile.damage
+                            if weapon.target.system:
+                                weapon.target.system.deal_damage(projectile.damage)
