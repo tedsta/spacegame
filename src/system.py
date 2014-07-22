@@ -1,5 +1,6 @@
 class System:
     def __init__(self):
+        self.id = ""
         self.power = 0
         self.max_power = 0
         self.damage = 0
