@@ -239,13 +239,6 @@ class Ship:
             if self.weapon_system:
                 for weapon in self.weapon_system.weapons:
                     weapon.sprite.update(dt)
-                    for projectile in weapon.projectiles:
-                        if projectile.active:
-                            projectile.sprite.update(dt)
-                        elif projectile.phase == 2: # Phase 2: detonation
-                            projectile.explosion_sprite.update(dt)
-                            if projectile.explosion_sprite.loop_done: # Explosion ended
-                                projectile.phase = 0
             for door in self.doors:
                 door.sprite.update(dt)
         else:

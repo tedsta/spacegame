@@ -179,6 +179,13 @@ class ClientBattleState(net.Handler):
         # Update sprites
         for ship in self.ships.values():
             ship.update_sprites(dt)
+        for projectile in self.projectiles:
+            if projectile.active:
+                projectile.sprite.update(dt)
+            elif projectile.phase == 2: # Phase 2: detonation
+                projectile.explosion_sprite.update(dt)
+                if projectile.explosion_sprite.loop_done: # Explosion ended
+                    projectile.phase = 0
 
     def apply_simulation_time(self, time):
         # Simulate crew
@@ -307,7 +314,7 @@ class ClientBattleState(net.Handler):
                 if len(self.ships)-len(self.losers) > 0:
                     self.turn_mode_text.string = "You lose"
                 else:
-                    self.turn_mode_text.string = "It's a tie!"
+                    self.turn_mode_text.string = "Tie!"
             else:
                 self.turn_mode_text.string = "You win!"
             target.draw(self.turn_mode_text)
