@@ -210,6 +210,9 @@ class ClientBattleState(net.Handler):
                 crew.position = crew.get_position_at_simulation_end()
                 # Update crew's current room for crew interface
                 crew.current_room = ship.room_at(crew.position.x, crew.position.y)
+                # Repair room if applicable
+                if not crew.path and crew.current_room.system and crew.current_room.system.damage > 0:
+                    crew.current_room.system.damage -= 1
                 # Clear path
                 crew.path[:] = []
                 # Check if crew reached destination
@@ -220,6 +223,9 @@ class ClientBattleState(net.Handler):
             if ship.weapon_system:
                 for weapon in ship.weapon_system.weapons:
                     weapon.was_powered = weapon.powered
+
+            # Update sprites for any visual changes (system damage color)
+            ship.update_sprites(0)
 
         # Check for ship deaths
         for ship in self.ships.values():
@@ -466,11 +472,6 @@ class ServerBattleState(net.Handler):
                 else:
                     weapon.firing = False
 
-        # Move crew
-        for ship in self.ships.values():
-            for crew in ship.crew:
-                crew.position = crew.get_position_at_simulation_end() 
-
     def calculate_crew_paths(self):
         for ship in self.ships.values():
             for crew in ship.crew:
@@ -513,10 +514,19 @@ class ServerBattleState(net.Handler):
         self.server.broadcast(packet)
 
     def end_simulation(self):
-        # Clear crew paths for next turn
-        for crew in self.crew_index.values():
-            crew.destination = None
-            crew.path[:] = []
+        # Move crew
+        for ship in self.ships.values():
+            for crew in ship.crew:
+                # Move
+                crew.position = crew.get_position_at_simulation_end() 
+                # Update crew's current room
+                crew.current_room = ship.room_at(crew.position.x, crew.position.y)
+                # Repair room if applicable
+                if not crew.path and crew.current_room.system and crew.current_room.system.damage > 0:
+                    crew.current_room.system.damage -= 1
+                # Clear crew paths for next turn
+                crew.destination = None
+                crew.path[:] = []
 
         # Deal projectile damage
         for ship in self.ships.values():
