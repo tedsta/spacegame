@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import math
+import random
 import sfml as sf
 
 import src.res as res
@@ -59,6 +61,27 @@ class WeaponSlot:
         else:
             return (self.position.x, self.position.y, self.rotate, self.mirror, self.slide_dir)
 
+class HullPiece:
+    
+    def __init__(self, texture, position, speed_min, speed_max, dir_min, dir_max, ang_min, ang_max):
+        self.sprite = sf.Sprite(texture)
+        self.sprite.origin = self.sprite.local_bounds.size/2
+        
+        self.position = self.sprite.origin+position
+        self.speed_min = speed_min
+        self.speed_max = speed_max
+        self.dir_min = dir_min
+        self.dir_max = dir_max
+        self.ang_min = ang_min
+        self.ang_max = ang_max
+        
+        self.velocity = sf.Vector2(math.cos(math.radians(dir_min)), math.sin(math.radians(dir_min)))*speed_min
+        self.angular_velocity = ang_min
+        
+    def apply_time(self, ship, time):
+        self.sprite.position = ship.sprite.position+self.position+(self.velocity*time)
+        self.sprite.rotation += ship.sprite.rotation+(self.angular_velocity*time)
+
 class Ship:
 
     def __init__(self, id=""):
@@ -72,8 +95,20 @@ class Ship:
 
         # Stats n stuff
         self.alive = True
-        self.exploding = False # Playing the explosion animation
         self.hull_points = 10
+        
+        # Explosion stuff
+        self.exploding = False # Playing the explosion animation
+        self.explosion_timer = 0
+        
+        self.hull_pieces = [\
+        HullPiece(res.ship_piece1, sf.Vector2(205, 60), 0.1, 0.2, 0, 360, -0.3, 0.3),\
+        HullPiece(res.ship_piece2, sf.Vector2(70, 108), 0.2, 0.4, 160, 200, -0.4, 0.4),\
+        HullPiece(res.ship_piece3, sf.Vector2(130, 127), 0.4, 0.6, 220, 260, -0.6, -0.2),\
+        HullPiece(res.ship_piece4, sf.Vector2(17, 0), 0.3, 0.5, 20, 70, -0.3, 0.3),\
+        HullPiece(res.ship_piece5, sf.Vector2(0, 61), 0.4, 0.8, 110, 160, -0.3, 0.3),\
+        HullPiece(res.ship_piece6, sf.Vector2(72, 0), 0.2, 0.5, 330, 350, -0.3, 0.3),\
+        ]
 
         # Path grid for pathfinding
         self.path_grid = Grid(10, 10)
@@ -228,6 +263,16 @@ class Ship:
     def blow_up(self):
         self.alive = False
         self.exploding = True
+        self.explosion_timer = 0
+        
+        # Randomize pieces' trajectories
+        for piece in self.hull_pieces:
+            speed = random.uniform(piece.speed_min, piece.speed_max)
+            dir = random.uniform(piece.dir_min, piece.dir_max)
+            ang = random.uniform(piece.ang_min, piece.ang_max)
+        
+            piece.velocity = sf.Vector2(math.cos(math.radians(dir)), math.sin(math.radians(dir))) * speed
+            piece.angular_velocity = ang
 
     def update_sprites(self, dt):
         if self.alive:
@@ -241,8 +286,10 @@ class Ship:
                     weapon.sprite.update(dt)
             for door in self.doors:
                 door.sprite.update(dt)
-        else:
-            self.exploding = False
+        elif self.exploding:
+            self.explosion_timer += dt
+            for piece in self.hull_pieces:
+                piece.apply_time(self, self.explosion_timer)
     
     def draw_hull_points(self, target):
         for i in range(0, self.hull_points):
@@ -292,7 +339,8 @@ class Ship:
                 health_bar.fill_color = sf.Color.GREEN
                 target.draw(health_bar)
         elif self.exploding:
-            pass
+            for piece in self.hull_pieces:
+                target.draw(piece.sprite)
 
     ###################################
     # Helper stuff

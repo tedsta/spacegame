@@ -207,7 +207,7 @@ class ClientBattleState(net.Handler):
 
         # See if any ships died
         for ship in self.ships.values():
-            if ship.hull_points <= 0:
+            if ship.alive and ship.hull_points <= 0:
                 ship.blow_up()
                 
     def end_simulation(self):

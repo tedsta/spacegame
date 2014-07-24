@@ -6,7 +6,7 @@ class WeaponSystem(System):
         System.__init__(self)
         self.weapons = []
         self.power = 0
-        self.max_power = 2
+        self.max_power = 3
 
     def on_power_changed(self):
         used = 0

@@ -17,6 +17,13 @@ human_color = sf.Texture.from_file("content/textures/crew/human_color.png")
 
 ship = sf.Texture.from_file("content/textures/ships/ship.png")
 
+ship_piece1 = sf.Texture.from_file("content/textures/ships/ship_piece1.png")
+ship_piece2 = sf.Texture.from_file("content/textures/ships/ship_piece2.png")
+ship_piece3 = sf.Texture.from_file("content/textures/ships/ship_piece3.png")
+ship_piece4 = sf.Texture.from_file("content/textures/ships/ship_piece4.png")
+ship_piece5 = sf.Texture.from_file("content/textures/ships/ship_piece5.png")
+ship_piece6 = sf.Texture.from_file("content/textures/ships/ship_piece6.png")
+
 ship_hull_point_rect = sf.RectangleShape()
 ship_hull_point_rect.size = (12, 24)
 ship_hull_point_rect.fill_color = sf.Color.GREEN
