@@ -80,7 +80,7 @@ class HullPiece:
         
     def apply_time(self, ship, time):
         self.sprite.position = ship.sprite.position+self.position+(self.velocity*time)
-        self.sprite.rotation += ship.sprite.rotation+(self.angular_velocity*time)
+        self.sprite.rotation = ship.sprite.rotation+(self.angular_velocity*time)
 
 class Ship:
 
@@ -102,12 +102,12 @@ class Ship:
         self.explosion_timer = 0
         
         self.hull_pieces = [\
-        HullPiece(res.ship_piece1, sf.Vector2(205, 60), 0.1, 0.2, 0, 360, -0.3, 0.3),\
-        HullPiece(res.ship_piece2, sf.Vector2(70, 108), 0.2, 0.4, 160, 200, -0.4, 0.4),\
-        HullPiece(res.ship_piece3, sf.Vector2(130, 127), 0.4, 0.6, 220, 260, -0.6, -0.2),\
-        HullPiece(res.ship_piece4, sf.Vector2(17, 0), 0.3, 0.5, 20, 70, -0.3, 0.3),\
-        HullPiece(res.ship_piece5, sf.Vector2(0, 61), 0.4, 0.8, 110, 160, -0.3, 0.3),\
-        HullPiece(res.ship_piece6, sf.Vector2(72, 0), 0.2, 0.5, 330, 350, -0.3, 0.3),\
+        HullPiece(res.ship_piece1, sf.Vector2(205, 60), 10, 20, 0, 360, -30, 30),\
+        HullPiece(res.ship_piece2, sf.Vector2(70, 108), 20, 40, 160, 200, -40, 40),\
+        HullPiece(res.ship_piece3, sf.Vector2(130, 127), 40, 60, 220, 260, -60, -20),\
+        HullPiece(res.ship_piece4, sf.Vector2(17, 0), 30, 50, 20, 70, -30, 30),\
+        HullPiece(res.ship_piece5, sf.Vector2(0, 61), 40, 80, 110, 160, -30, 30),\
+        HullPiece(res.ship_piece6, sf.Vector2(72, 0), 20, 50, 330, 350, -30, 30),\
         ]
 
         # Path grid for pathfinding
