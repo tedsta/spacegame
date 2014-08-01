@@ -14,6 +14,12 @@ class KeyHandler(metaclass=ABCMeta):
     def on_key_released(self, key_code):
         pass
 
+class TextHandler(metaclass=ABCMeta):
+    
+    @abstractmethod
+    def on_text_entered(self, unicode):
+        pass
+
 # Abstract mouse handler interface
 class MouseHandler(metaclass=ABCMeta):
 
@@ -35,6 +41,7 @@ class InputSystem:
         self.window = window
         self.old_mouse_pos = sf.Vector2(0, 0)
         self.key_handlers = []
+        self.text_handlers = []
         self.mouse_handlers = []
     
     def handle(self):
@@ -50,6 +57,10 @@ class InputSystem:
                 elif event.released:
                     for handler in self.key_handlers:
                         handler.on_key_released(event.code)
+            # Typing event
+            elif type(event) is sf.TextEvent:
+                for handler in self.text_handlers:
+                    handler.on_text_entered(event.unicode)
             # Mouse button event
             elif type(event) is sf.MouseButtonEvent:
                 if event.pressed:
@@ -66,6 +77,10 @@ class InputSystem:
     
     def add_key_handler(self, handler):
         self.key_handlers.append(handler)
+        
+    def add_text_handler(self, handler):
+        self.text_handlers.append(handler)
     
     def add_mouse_handler(self, handler):
-        self.mouse_handlers.append(handler)
+        self.mouse_handlers.append(handler) 
+    

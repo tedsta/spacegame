@@ -48,6 +48,7 @@ class ClientBattleState(net.Handler):
                 print("added enemy ship: " + str(ship))
                 self.enemy_ship = ship # TODO
         self.input.add_mouse_handler(self.weapons_interface)
+        self.input.add_text_handler(self.weapons_interface)
         
         # Turn stuff
         self.mode = const.plan
@@ -99,6 +100,8 @@ class ClientBattleState(net.Handler):
             self.plan(dt)
         elif self.mode == const.simulate:
             self.simulate(dt)
+        
+        self.weapons_interface.update(dt)
 
     ########################################
     # Plan

@@ -83,6 +83,11 @@ laser_light1 = sf.Texture.from_file("content/textures/weapons/laser_light1.png")
 explosion_missile1 = sf.Texture.from_file("content/textures/effects/explosion_missile1.png")
 
 ###################
+# GUI
+button = sf.Texture.from_file("content/textures/gui/button.png")
+textbox = sf.Texture.from_file("content/textures/gui/textbox.png")
+
+###################
 # fonts
 
 font_8bit = sf.Font.from_file("content/fonts/8bit.ttf")

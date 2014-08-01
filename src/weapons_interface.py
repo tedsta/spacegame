@@ -140,4 +140,3 @@ class WeaponsInterface(MouseHandler):
             target.draw(button.rectangle)
 
 
-
