@@ -40,7 +40,7 @@ class Element:
 class SpriteElement(Element):
     def __init__(self, pos, type, frames, frames_per_row, input):
         super().__init__(pos, input)
-        self.position = pos # position on window
+        self.position = pos
         self.sprite = SpriteSheet(res.textures[type])
         self.sprite.init(frames, frames_per_row)
         self.sprite.position = pos
@@ -50,11 +50,11 @@ class SpriteElement(Element):
         target.draw(self.sprite)
 
 class Button(SpriteElement):
-    def __init__(self, pos, type, frames, frames_per_row, input): # assumes it's all in one picture
+    def __init__(self, pos, type, frames, frames_per_row, text, input): # assumes it's all in one picture
         super().__init__(pos, type, frames, frames_per_row, input)
         
     def on_mouse_button_pressed(self, mouse_button, x, y):
-        if contains(self.local_bounds, sf.Vector2(x, y)):
+        if contains(self.sprite.local_bounds, sf.Vector2(x, y)):
             self.sprite.set_frame(2) # down
     
     def on_mouse_button_released(self, button, x, y):
@@ -65,6 +65,9 @@ class Button(SpriteElement):
             self.sprite.set_frame(1) # hover
         else:
             self.sprite.set_frame(0) # up
+            
+    def update(self, dt):
+        pass
             
     def draw(self, target):
         super().draw(target)
@@ -78,8 +81,6 @@ class Textbox(SpriteElement):
         self.local_bounds = sf.Rectangle(pos, sf.Vector2(width, self.sprite.texture.height))
         
         self.typing = False
-        self.overlapping = False # if the text goes out the textbox
-        self.default_text = default_text
         self.text = sf.Text(default_text, res.font_farmville, 20)
         self.text.position = self.local_bounds.position
         self.text.color = sf.Color.BLACK
@@ -87,24 +88,19 @@ class Textbox(SpriteElement):
         input.add_text_handler(self)
         
     def on_text_entered(self, unicode):
-        if unicode != 8 and unicode != 13 and self.typing is True and not self.overlapping: # not backspace, not enter, text still inside box
+        if unicode != 8 and unicode != 13 and self.typing is True: # not backspace, not enter
             self.text.string += chr(unicode);
         elif unicode == 8 and self.typing is True: # You press backspace
             self.text.string = self.text.string[:-1]
-            if self.overlapping:
-                self.overlapping = False
         elif unicode == 13: # Enter
             self.typing = False
         
     def on_mouse_button_pressed(self, mouse_button, x, y):
         if contains(self.local_bounds, sf.Vector2(x, y)):
             self.typing = True
-            if self.text.string == self.default_text: # if it's the default text, get rid of it
-                self.text.string = ""
-        elif not contains(self.local_bounds, sf.Vector2(x, y)):
+            self.text.string = ""
+        else:
             self.typing = False
-            if self.text.string == "": # if you unclick it and there's nothing there, make it the default text
-                self.text.string = self.default_text
         
     def draw(self, target):
         super().draw(target)
@@ -113,9 +109,6 @@ class Textbox(SpriteElement):
     def update(self, dt):
         if self.text.position != (self.local_bounds.position + self.text_offset):
             self.text.position = (self.local_bounds.position + self.text_offset)
-            
-        if self.text.local_bounds.width+self.text_offset.x+17 > self.local_bounds.width:
-            self.overlapping = True
 
 class Window():
     def __init__(self, pos, width, height, color, input):
@@ -185,5 +178,3 @@ class Window():
     def update(self, dt):
         for child in self.children:
             child.update(dt)
-        
-
