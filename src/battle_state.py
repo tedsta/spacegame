@@ -101,7 +101,7 @@ class ClientBattleState(net.Handler):
         elif self.mode == const.simulate:
             self.simulate(dt)
         
-        self.weapons_interface.update(dt)
+        #self.weapons_interface.update(dt)
 
     ########################################
     # Plan
