@@ -92,6 +92,11 @@ class Ship:
         self.sprite_offset = sf.Vector2(-71, -40)
         self.room_offset = sf.Vector2(63, 32) # Offset of room origin
         self.position = sf.Vector2(0, 0)
+        
+        # Shield renering
+        self.shields_offset = sf.Vector2(-30, -50)
+        self.shields_sprite = sf.Sprite(res.shields)
+        #self.shields_sprite.origin - self.shields_sprite.local_bounds.size/2
 
         # Stats n stuff
         self.alive = True
@@ -299,6 +304,7 @@ class Ship:
     def draw(self, target):
         # First, update all the sprite positions
         self.sprite.position = self.position+self.sprite_offset
+        self.shields_sprite.position = self.position+self.sprite_offset+self.shields_offset
         for crew in self.crew:
             crew.sprite.position = self.sprite.position+self.room_offset+(crew.position*const.block_size)
         for room in self.rooms:
@@ -321,6 +327,7 @@ class Ship:
 
         if self.alive:
             # Draw everything
+            target.draw(self.shields_sprite)
             if self.weapon_system:
                 for weapon in self.weapon_system.weapons:
                     target.draw(weapon.sprite)

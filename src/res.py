@@ -24,6 +24,8 @@ ship_piece4 = sf.Texture.from_file("content/textures/ships/ship_piece4.png")
 ship_piece5 = sf.Texture.from_file("content/textures/ships/ship_piece5.png")
 ship_piece6 = sf.Texture.from_file("content/textures/ships/ship_piece6.png")
 
+shields = sf.Texture.from_file("content/textures/ships/shields.png")
+
 ship_hull_point_rect = sf.RectangleShape()
 ship_hull_point_rect.size = (12, 24)
 ship_hull_point_rect.fill_color = sf.Color.GREEN
