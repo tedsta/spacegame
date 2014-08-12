@@ -1,0 +1,1 @@
+python C:/Python33/Scripts/cxfreeze client.py --include-modules=numbers,re --exclude-modules=sfml --target-dir client_dist
