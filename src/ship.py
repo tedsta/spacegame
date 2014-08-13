@@ -343,7 +343,9 @@ class Ship:
 
         if self.alive:
             # Draw everything
-            target.draw(self.shields_sprite)
+            if self.shield_system:
+                self.shields_sprite.color = sf.Color(255, 255, 255, self.shield_system.shields * (255//4))
+                target.draw(self.shields_sprite)
             if self.weapon_system:
                 for weapon in self.weapon_system.weapons:
                     target.draw(weapon.sprite)

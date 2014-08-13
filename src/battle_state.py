@@ -76,8 +76,10 @@ class ClientBattleState(net.Handler):
         for ship in ships.values():
             ship.engine_system.id = ship.id+":engine_sys"
             ship.weapon_system.id = ship.id+":weapon_sys"
+            ship.shield_system.id = ship.id+":shield_sys"
             self.system_index[ship.engine_system.id] = ship.engine_system
             self.system_index[ship.weapon_system.id] = ship.weapon_system
+            self.system_index[ship.shield_system.id] = ship.shield_system
         
         # Weapon index and projectiles
         self.weapon_index = {}
@@ -137,6 +139,7 @@ class ClientBattleState(net.Handler):
         systems_power = {}
         systems_power[self.player_ship.engine_system.id] = self.player_ship.engine_system.power
         systems_power[self.player_ship.weapon_system.id] = self.player_ship.weapon_system.power
+        systems_power[self.player_ship.shield_system.id] = self.player_ship.shield_system.power
         packet.write(systems_power)
         # Send weapon poweredness (map weapon ids to bool) and targets
         weapon_powered = {} # {weap_id : room_id}
@@ -233,6 +236,8 @@ class ClientBattleState(net.Handler):
             if ship.weapon_system:
                 for weapon in ship.weapon_system.weapons:
                     weapon.was_powered = weapon.powered
+                    for projectile in weapon.projectiles:
+                        projectile.active = False
                     
             # Shields
             if ship.shield_system:
@@ -342,6 +347,11 @@ class ClientBattleState(net.Handler):
         paths_dict = packet.read()
         for crew_id, path in paths_dict.items():
             self.crew_index[crew_id].path = path
+        # System stuff
+        systems_power = packet.read()
+        for system_id, power in systems_power.items():
+            self.system_index[system_id].power = power
+            self.system_index[system_id].on_power_changed()
         # Weapon stuff
         weapon_powered = packet.read() # {weap_id : room_id}
         weapon_targets = packet.read() # {weap_id : bool}
@@ -368,7 +378,6 @@ class ClientBattleState(net.Handler):
                 hit = hit_tup[1]
                 hit_shields = hit_tup[2]
                 weapon = self.weapon_index[weap_id]
-                weapon.firing = True
                 projectile = weapon.projectiles[proj_index]
                 projectile.target_room = self.weapon_index[weap_id].target
                 projectile.hit = hit
@@ -386,7 +395,7 @@ class ClientBattleState(net.Handler):
                 # Timing stuff
                 projectile.fire_time = proj_index*0.5 # Fire each projectile half a second after the previous
                 if projectile.hit_shields:
-                    projectile.hit_time = projectile.fire_time+2
+                    projectile.hit_time = projectile.fire_time+3
                 else:
                     projectile.hit_time = projectile.fire_time+3 # Hit 3 seconds after fire
 
@@ -423,8 +432,10 @@ class ServerBattleState(net.Handler):
         for ship in ships.values():
             ship.engine_system.id = ship.id+":engine_sys"
             ship.weapon_system.id = ship.id+":weapon_sys"
+            ship.shield_system.id = ship.id+":shield_sys"
             self.system_index[ship.engine_system.id] = ship.engine_system
             self.system_index[ship.weapon_system.id] = ship.weapon_system
+            self.system_index[ship.shield_system.id] = ship.shield_system
         
         # Weapon index
         self.weapon_index = {}
@@ -446,15 +457,17 @@ class ServerBattleState(net.Handler):
             # Handle crew paths
             for crew_id, destination in packet.read().items():
                 self.crew_index[crew_id].destination = sf.Vector2(*destination)
-            # Receive weapon plans
+            # Systems
             systems_power = packet.read()
             for system_id, power in systems_power.items():
                 self.system_index[system_id].power = power
-            # Weapon targets
+                self.system_index[system_id].on_power_changed()
+            # Receive weapon plans
+            # Weapon on/off
             weapon_powered = packet.read()
             for weap_id, powered in weapon_powered.items():
                 self.weapon_index[weap_id].powered = powered
-            # Weapon on/off
+            # Weapon targets
             weapon_targets = packet.read()
             for weap_id, target_id in weapon_targets.items():
                 if target_id:
@@ -523,6 +536,11 @@ class ServerBattleState(net.Handler):
         for crew in self.crew_index.values():
             paths_dict[crew.id] = crew.path
         packet.write(paths_dict)
+        # Send system power
+        systems_power = {}
+        for id, system in self.system_index.items():
+            systems_power[id] = system.power
+        packet.write(systems_power)
         # Send weapon results
         weapon_powered = {} # {weap_id : room_id}
         weapon_targets = {} # {weap_id : bool}
