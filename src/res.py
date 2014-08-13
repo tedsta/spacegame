@@ -45,6 +45,7 @@ sf.Texture.from_file("content/textures/rooms/1x2.png"),\
 sf.Texture.from_file("content/textures/rooms/1x2.png"),\
 sf.Texture.from_file("content/textures/rooms/2x2.png"),\
 sf.Texture.from_file("content/textures/rooms/2x2.png"),\
+sf.Texture.from_file("content/textures/rooms/2x2.png"),\
 ]
 
 # room overlays
@@ -55,6 +56,7 @@ None,\
 sf.Texture.from_file("content/textures/rooms/room_pilot1x2.png"),\
 sf.Texture.from_file("content/textures/rooms/room_engines2x2.png"),\
 sf.Texture.from_file("content/textures/rooms/room_weapons2x2.png"),\
+sf.Texture.from_file("content/textures/rooms/room_shields2x2.png"),\
 ]
 
 # room icons
@@ -65,6 +67,7 @@ None,\
 sf.Texture.from_file("content/textures/rooms/icon_pilot.png"),\
 sf.Texture.from_file("content/textures/rooms/icon_engines.png"),\
 sf.Texture.from_file("content/textures/rooms/icon_weapons.png"),\
+sf.Texture.from_file("content/textures/rooms/icon_shields.png"),\
 ]
 
 ###################

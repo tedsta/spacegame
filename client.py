@@ -12,6 +12,7 @@ from src.ship import Ship
 from src.crew import Crew
 from src.weapon import Weapon
 from src.weapon_system import WeaponSystem
+from src.shield_system import ShieldSystem
 
 # Parse args
 ip_address = "localhost"
@@ -35,6 +36,7 @@ try:
     ship = Ship(client.client_id)
     
     ship.weapon_system = WeaponSystem()
+    ship.shield_system = ShieldSystem()
 
     ship.add_weapon_slot(360, 80, True, True, "right")
     ship.add_weapon_slot(360, 120, True, False, "right")
@@ -48,7 +50,7 @@ try:
     ship.add_room(const.room2x1, 4, 3)
     ship.add_room(const.room2x1, 2, 5)
     ship.add_room(const.room_weapons2x2, 3, 1)
-    ship.add_room(const.room2x2, 4, 4)
+    ship.add_room(const.room_shields2x2, 4, 4)
 
     # Create a crew
     ship.add_crew(Crew(), 0, 0)

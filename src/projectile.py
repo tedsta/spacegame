@@ -45,7 +45,7 @@ class Projectile:
 
     def detonate(self):
         if self.hit_shields:
-            self.target_room.ship.shield_points -= self.damage
+            self.target_room.ship.shield_system.shields -= self.damage
         else:
             self.target_room.ship.hull_points -= self.damage
             if self.target_room.system:

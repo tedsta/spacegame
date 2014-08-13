@@ -233,6 +233,11 @@ class ClientBattleState(net.Handler):
             if ship.weapon_system:
                 for weapon in ship.weapon_system.weapons:
                     weapon.was_powered = weapon.powered
+                    
+            # Shields
+            if ship.shield_system:
+                if ship.shield_system.shields < ship.shield_system.max_shields:
+                    ship.shield_system.shields += 1
 
             # Update sprites for any visual changes (system damage color)
             ship.update_sprites(0)
@@ -375,7 +380,7 @@ class ClientBattleState(net.Handler):
                 projectile.from_offscreen_position = weapon.sprite.position + sf.Vector2(-100, -100)
                 if projectile.hit_shields:
                     target = weapon.target.sprite.position+weapon.target.sprite.global_bounds.size/2
-                    projectile.target_position = (target-projectile.from_offscreen_position)/2 + projectile.from_offscreen_position
+                    projectile.target_position = (target-projectile.from_offscreen_position)/2.5 + projectile.from_offscreen_position
                 else:
                     projectile.target_position = weapon.target.sprite.position+weapon.target.sprite.global_bounds.size/2
                 # Timing stuff
@@ -482,18 +487,18 @@ class ServerBattleState(net.Handler):
                     for projectile in weapon.projectiles:
                         if weapon.target.ship.engine_system.power == 0:
                             projectile.hit = True
-                            if weapon.target.ship.shield_points > 0:
+                            if weapon.target.ship.shield_system and weapon.target.ship.shield_system.shields > 0:
                                 projectile.hit_shields = True
-                                weapon.target.ship.shield_points -= projectile.damage
+                                weapon.target.ship.shield_system.shields -= projectile.damage
                             else:
                                 projectile.hit_shields = False
                         else:
                             evade_chance = random.randrange(0, 100)
                             if evade_chance >= 50:
                                 projectile.hit = True
-                                if weapon.target.ship.shield_points > 0:
+                                if weapon.target.ship.shield_system and weapon.target.ship.shield_system.shields > 0:
                                     projectile.hit_shields = True
-                                    weapon.target.ship.shield_points -= projectile.damage
+                                    weapon.target.ship.shield_system.shields -= projectile.damage
                                 else:
                                     projectile.hit_shields = False
                             else:
@@ -568,3 +573,9 @@ class ServerBattleState(net.Handler):
                             weapon.target.ship.hull_points -= projectile.damage
                             if weapon.target.system:
                                 weapon.target.system.deal_damage(projectile.damage)
+                                
+        # Shields
+        for ship in self.ships.values():
+            if ship.shield_system:
+                if ship.shield_system.shields < ship.shield_system.max_shields:
+                    ship.shield_system.shields += 1

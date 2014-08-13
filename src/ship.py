@@ -14,6 +14,7 @@ from src.path import WalkDirs
 
 from src.weapon import Weapon
 from src.weapon_system import WeaponSystem
+from src.shield_system import ShieldSystem
 from src.engine_system import EngineSystem
 
 class WeaponSlot:
@@ -101,7 +102,6 @@ class Ship:
         # Stats n stuff
         self.alive = True
         self.hull_points = 10
-        self.shield_points = 2
         
         # Explosion stuff
         self.exploding = False # Playing the explosion animation
@@ -128,12 +128,17 @@ class Ship:
         
         self.weapon_system = None
         self.engine_system = EngineSystem()
+        self.shield_system = None
 
     def serialize(self, packet):
         packet.write(self.id)
         packet.write([slot.tuplify() for slot in self.weapon_slots])
         if self.weapon_system:
             packet.write(self.weapon_system.tuplify())
+        else:
+            packet.write(None)
+        if self.shield_system:
+            packet.write(self.shield_system.tuplify())
         else:
             packet.write(None)
         packet.write([room.tuplify() for room in self.rooms])
@@ -152,6 +157,10 @@ class Ship:
             for slot in self.weapon_slots:
                 if slot.weapon:
                     self.weapon_system.weapons.append(slot.weapon)
+        # Shield system
+        shield_sys_tuple = packet.read()
+        if shield_sys_tuple:
+            self.shield_system = ShieldSystem(*shield_sys_tuple)
         rooms = packet.read()
         for room_tuple in rooms: 
             self.add_room(*room_tuple)
@@ -200,6 +209,8 @@ class Ship:
             room.system = self.engine_system
         elif room_type == const.room_weapons2x2:
             room.system = self.weapon_system
+        elif room_type == const.room_shields2x2:
+            room.system = self.shield_system
 
         # Update sprites
         room.update_sprites(0)
@@ -301,9 +312,10 @@ class Ship:
         for i in range(0, self.hull_points):
             res.ship_hull_point_rect.position = self.position + sf.Vector2(2 + i*16, -80)
             target.draw(res.ship_hull_point_rect)
-        for i in range(0, self.shield_points):
-            res.ship_shield_point_rect.position = self.position + sf.Vector2(2 + i*16, -50)
-            target.draw(res.ship_shield_point_rect)
+        if self.shield_system:
+            for i in range(0, self.shield_system.shields):
+                res.ship_shield_point_rect.position = self.position + sf.Vector2(2 + i*16, -50)
+                target.draw(res.ship_shield_point_rect)
     
     def draw(self, target):
         # First, update all the sprite positions

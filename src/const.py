@@ -31,6 +31,7 @@ room1x2 = 2
 room_pilot1x2 = 3
 room_engines2x2 = 4
 room_weapons2x2 = 5
+room_shields2x2 = 6
 
 # room dimensions
 room_dims = [\
@@ -38,6 +39,7 @@ room_dims = [\
 (2,1),\
 (1,2),\
 (1,2),\
+(2,2),\
 (2,2),\
 (2,2),\
 ]

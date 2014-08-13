@@ -40,6 +40,7 @@ class SystemsInterface(MouseHandler):
 
         self.add_button(self.ship.engine_system)
         self.add_button(self.ship.weapon_system)
+        self.add_button(self.ship.shield_system)
 
     def add_button(self, system):
         x_offset = self.BUTTON_OFFSET_X + (len(self.buttons) * (self.BUTTON_WIDTH + self.BUTTON_RIGHT_MARGIN)) + self.BUTTON_RIGHT_MARGIN

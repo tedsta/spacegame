@@ -2,11 +2,11 @@ from src.system import System
 from src.weapon import Weapon
 
 class WeaponSystem(System):
-    def __init__(self, max_power=1):
+    def __init__(self, max_power=3):
         System.__init__(self)
         self.weapons = []
         self.power = 0
-        self.max_power = 3
+        self.max_power = max_power
 
     def on_power_changed(self):
         used = 0
@@ -30,4 +30,4 @@ class WeaponSystem(System):
         self.power -= weapon.required_power
 
     def tuplify(self):
-        return (1,)
+        return (self.max_power,)
