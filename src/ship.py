@@ -101,6 +101,7 @@ class Ship:
         # Stats n stuff
         self.alive = True
         self.hull_points = 10
+        self.shield_points = 2
         
         # Explosion stuff
         self.exploding = False # Playing the explosion animation
@@ -298,8 +299,11 @@ class Ship:
     
     def draw_hull_points(self, target):
         for i in range(0, self.hull_points):
-            res.ship_hull_point_rect.position = self.position + sf.Vector2(2 + i*16, -50)
+            res.ship_hull_point_rect.position = self.position + sf.Vector2(2 + i*16, -80)
             target.draw(res.ship_hull_point_rect)
+        for i in range(0, self.shield_points):
+            res.ship_shield_point_rect.position = self.position + sf.Vector2(2 + i*16, -50)
+            target.draw(res.ship_shield_point_rect)
     
     def draw(self, target):
         # First, update all the sprite positions

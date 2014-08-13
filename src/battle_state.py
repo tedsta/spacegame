@@ -361,20 +361,29 @@ class ClientBattleState(net.Handler):
             for hit_tup in proj_hits:
                 proj_index = hit_tup[0]
                 hit = hit_tup[1]
+                hit_shields = hit_tup[2]
                 weapon = self.weapon_index[weap_id]
                 weapon.firing = True
                 projectile = weapon.projectiles[proj_index]
                 projectile.target_room = self.weapon_index[weap_id].target
                 projectile.hit = hit
+                projectile.hit_shields = hit_shields
                 projectile.phase = 0
                 # Projectile travel path stuff
                 projectile.start_position = weapon.sprite.position + sf.Vector2(30, 0)
                 projectile.to_offscreen_position = weapon.sprite.position + sf.Vector2(1200, 0)
                 projectile.from_offscreen_position = weapon.sprite.position + sf.Vector2(-100, -100)
-                projectile.target_position = weapon.target.sprite.position+weapon.target.sprite.global_bounds.size/2
+                if projectile.hit_shields:
+                    target = weapon.target.sprite.position+weapon.target.sprite.global_bounds.size/2
+                    projectile.target_position = (target-projectile.from_offscreen_position)/2 + projectile.from_offscreen_position
+                else:
+                    projectile.target_position = weapon.target.sprite.position+weapon.target.sprite.global_bounds.size/2
                 # Timing stuff
                 projectile.fire_time = proj_index*0.5 # Fire each projectile half a second after the previous
-                projectile.hit_time = projectile.fire_time+3 # Hit 3 seconds after fire
+                if projectile.hit_shields:
+                    projectile.hit_time = projectile.fire_time+2
+                else:
+                    projectile.hit_time = projectile.fire_time+3 # Hit 3 seconds after fire
 
 ###############################################################################
 # Server
@@ -473,10 +482,20 @@ class ServerBattleState(net.Handler):
                     for projectile in weapon.projectiles:
                         if weapon.target.ship.engine_system.power == 0:
                             projectile.hit = True
+                            if weapon.target.ship.shield_points > 0:
+                                projectile.hit_shields = True
+                                weapon.target.ship.shield_points -= projectile.damage
+                            else:
+                                projectile.hit_shields = False
                         else:
                             evade_chance = random.randrange(0, 100)
                             if evade_chance >= 50:
                                 projectile.hit = True
+                                if weapon.target.ship.shield_points > 0:
+                                    projectile.hit_shields = True
+                                    weapon.target.ship.shield_points -= projectile.damage
+                                else:
+                                    projectile.hit_shields = False
                             else:
                                 projectile.hit = False
                 else:
@@ -515,7 +534,7 @@ class ServerBattleState(net.Handler):
                 hits = []
                 if weapon.firing:
                     for i, projectile in enumerate(weapon.projectiles):
-                        hits.append((i, projectile.hit))
+                        hits.append((i, projectile.hit, projectile.hit_shields))
                 projectile_hits[weapon.id] = hits
         packet.write(weapon_powered)
         packet.write(weapon_targets)

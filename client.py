@@ -88,7 +88,7 @@ try:
 
     for client_id, other_ship in ships.items():
         if client_id == client.client_id:
-            other_ship.set_position(sf.Vector2(50, 50))
+            other_ship.set_position(sf.Vector2(50, 100))
         else:
             other_ship.set_position(sf.Vector2(100, 150))
     

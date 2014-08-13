@@ -30,6 +30,10 @@ ship_hull_point_rect = sf.RectangleShape()
 ship_hull_point_rect.size = (12, 24)
 ship_hull_point_rect.fill_color = sf.Color.GREEN
 
+ship_shield_point_rect = sf.RectangleShape()
+ship_shield_point_rect.size = (12, 24)
+ship_shield_point_rect.fill_color = sf.Color.BLUE
+
 ###################
 # room stuff
 

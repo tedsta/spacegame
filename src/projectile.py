@@ -22,6 +22,7 @@ class Projectile:
         self.fire_time = 0
         self.hit_time = 0
         self.hit = True # Hit or miss?
+        self.hit_shields = False # Hit shields or ship?
         self.active = False
         self.is_mine = False # Does this projectile belong to me? (Client only, used for lock_window stuff)
 
@@ -43,9 +44,12 @@ class Projectile:
         self.sprite.position = start_position + (end_position-start_position)*interp
 
     def detonate(self):
-        self.target_room.ship.hull_points -= self.damage
-        if self.target_room.system:
-            self.target_room.system.deal_damage(self.damage)
+        if self.hit_shields:
+            self.target_room.ship.shield_points -= self.damage
+        else:
+            self.target_room.ship.hull_points -= self.damage
+            if self.target_room.system:
+                self.target_room.system.deal_damage(self.damage)
         self.active = False
         self.phase = 2
         self.explosion_sprite.set_frame_loop(0, 8, False)
