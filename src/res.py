@@ -61,12 +61,6 @@ sf.Texture.from_file("content/textures/rooms/icon_shields.png"),\
 ]
 
 ###################
-# door stuff
-
-door_h = sf.Texture.from_file("content/textures/rooms/door_h.png")
-door_v = sf.Texture.from_file("content/textures/rooms/door_v.png")
-
-###################
 # weapons
 
 weapon = sf.Texture.from_file("content/textures/weapons/laser.png")

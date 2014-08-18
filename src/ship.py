@@ -8,7 +8,6 @@ import src.res as res
 import src.const as const
 from src.grid import Grid
 from src.room import Room
-from src.door import Door
 
 from src.weapon import Weapon
 from src.weapon_system import WeaponSystem
@@ -119,7 +118,6 @@ class Ship:
         
         # Things on the ship
         self.rooms = []
-        self.doors = []
 
         self.weapon_slots = []
         
@@ -178,24 +176,6 @@ class Ship:
         if self.room_at(x, y, width, height):
             return False
 
-        # Add doors
-        # X axis
-        for i in range(x, x+width):
-            # Top side
-            if self.room_at(i, y-1):
-                self.add_door(sf.Vector2(i, y-1), sf.Vector2(i, y))
-            # Bottom side
-            if self.room_at(i, y+height):
-                self.add_door(sf.Vector2(i, y+height-1), sf.Vector2(i, y+height))
-        # Y axis
-        for j in range(y, y+height):
-            # Left side
-            if self.room_at(x-1, j):
-                self.add_door(sf.Vector2(x-1, j), sf.Vector2(x, j))
-            # Right side
-            if self.room_at(x+width, j):
-                self.add_door(sf.Vector2(x+width-1, j), sf.Vector2(x+width, j))
-
         # Link room to system
         if room_type == const.room_engines2x2:
             room.system = self.engine_system
@@ -210,20 +190,6 @@ class Ship:
         self.rooms.append(room)
         return True
 
-    def add_door(self, pos_a, pos_b):
-        door = Door(pos_a, pos_b)
-        # Horizontal
-        if pos_b-pos_a == sf.Vector2(1, 0):
-            door.sprite.position = self.sprite.position+self.room_offset+(pos_b*const.block_size)+sf.Vector2(-3, 7)
-        # Vertical
-        elif pos_b-pos_a == sf.Vector2(0, 1):
-            door.sprite.position = self.sprite.position+self.room_offset+(pos_b*const.block_size)+sf.Vector2(7, -3)
-        # WTF?
-        else:
-            return False
-        self.doors.append(door)
-        return True
-    
     def add_weapon_slot(self, x, y, rotate, mirror, slide_dir):
         self.weapon_slots.append(WeaponSlot(x, y, rotate, mirror, slide_dir))
 
@@ -272,8 +238,6 @@ class Ship:
             if self.weapon_system:
                 for weapon in self.weapon_system.weapons:
                     weapon.sprite.update(dt)
-            for door in self.doors:
-                door.sprite.update(dt)
         elif self.exploding:
             self.explosion_timer += dt
             for piece in self.hull_pieces:
@@ -302,13 +266,6 @@ class Ship:
                     weapon.sprite.rotation = weapon.slot.rotation
                 if weapon.slot.mirror:
                     weapon.sprite.ratio = weapon.slot.scale
-        for door in self.doors:
-            # Horizontal
-            if door.pos_b-door.pos_a == sf.Vector2(1, 0):
-                door.sprite.position = self.sprite.position+self.room_offset+(door.pos_b*const.block_size)+sf.Vector2(-3, 7)
-            # Vertical
-            elif door.pos_b-door.pos_a == sf.Vector2(0, 1):
-                door.sprite.position = self.sprite.position+self.room_offset+(door.pos_b*const.block_size)+sf.Vector2(7, -3)
 
         if self.alive:
             # Draw everything
@@ -321,8 +278,6 @@ class Ship:
             target.draw(self.sprite)
             for room in self.rooms:
                 room.draw(target)
-            for door in self.doors:
-                target.draw(door.sprite)
         elif self.exploding:
             for piece in self.hull_pieces:
                 target.draw(piece.sprite)
