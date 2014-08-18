@@ -7,10 +7,8 @@ import sfml as sf
 import src.res as res
 import src.const as const
 import src.net as net
-from src.crew_interface import CrewInterface
 from src.weapons_interface import WeaponsInterface
 from src.systems_interface import SystemsInterface
-from src.path import find_path
 from src.projectile import Projectile
 
 class ClientBattleState(net.Handler):
@@ -31,10 +29,6 @@ class ClientBattleState(net.Handler):
         self.player_ship = self.ships[self.client.client_id]
         self.enemy_ship = None
         self.losers = []
-        
-        # Create the crew interface
-        self.crew_interface = CrewInterface(self.player_ship)
-        self.input.add_mouse_handler(self.crew_interface)
         
         # Create the systems interface
         self.systems_interface = SystemsInterface(self.player_ship)
@@ -59,12 +53,6 @@ class ClientBattleState(net.Handler):
         self.turn_mode_text = sf.Text("0", res.font_8bit, 20)
         self.turn_mode_text.position = sf.Vector2(400, 30)
 
-        # Crew index
-        self.crew_index = {}
-        for ship in ships.values():
-            for crew in ship.crew:
-                self.crew_index[crew.id] = crew
-        
         # Room index
         self.room_index = {}
         for ship in ships.values():
@@ -131,9 +119,6 @@ class ClientBattleState(net.Handler):
         packet.write(const.packet_plans)
         # Write turn number
         packet.write(self.turn_number)
-        # Write crew destinations dictionary
-        crew_destinations = self._build_crew_destinations_dictionary()
-        packet.write(crew_destinations)
         # Send system poweredness
         # TODO
         systems_power = {}
@@ -156,13 +141,6 @@ class ClientBattleState(net.Handler):
         # Send to server
         self.client.send(packet)
 
-    def _build_crew_destinations_dictionary(self):
-        crew_destinations = {}
-        for crew in self.player_ship.crew:
-            if crew.destination:
-                crew_destinations[crew.id] = (crew.destination.x, crew.destination.y)
-        return crew_destinations
-    
     ########################################
     # Simulate
 
@@ -194,11 +172,6 @@ class ClientBattleState(net.Handler):
                     projectile.phase = 0
 
     def apply_simulation_time(self, time):
-        # Simulate crew
-        for ship in self.ships.values():
-            for crew in ship.crew:
-                crew.apply_simulation_time(time)
-
         # Simulate weapons
         for ship in self.ships.values():
             if not ship.weapon_system:
@@ -218,20 +191,6 @@ class ClientBattleState(net.Handler):
                 
     def end_simulation(self):
         for ship in self.ships.values():
-            for crew in ship.crew:
-                # Set crew's position to where it reaches at the end of the simulation
-                crew.position = crew.get_position_at_simulation_end()
-                # Update crew's current room for crew interface
-                crew.current_room = ship.room_at(crew.position.x, crew.position.y)
-                # Repair room if applicable
-                if not crew.path and crew.current_room.system and crew.current_room.system.damage > 0:
-                    crew.current_room.system.damage -= 1
-                # Clear path
-                crew.path[:] = []
-                # Check if crew reached destination
-                if crew.position == crew.destination:
-                    crew.destination = None
-            
             # Weapons
             if ship.weapon_system:
                 for weapon in ship.weapon_system.weapons:
@@ -292,9 +251,6 @@ class ClientBattleState(net.Handler):
                 else:
                     target.draw(projectile.explosion_sprite)
         
-        # Draw crew interface
-        self.crew_interface.draw(target)
-        
         # Draw systems interface
         self.systems_interface.draw(target)
 
@@ -343,10 +299,6 @@ class ClientBattleState(net.Handler):
             self.mode = const.simulate
 
     def _handle_simulation_results(self, packet):
-        # Crew paths
-        paths_dict = packet.read()
-        for crew_id, path in paths_dict.items():
-            self.crew_index[crew_id].path = path
         # System stuff
         systems_power = packet.read()
         for system_id, power in systems_power.items():
@@ -415,12 +367,6 @@ class ServerBattleState(net.Handler):
         # Turn stuff
         self.turn_number = 0
         
-        # Crew index
-        self.crew_index = {}
-        for ship in ships.values():
-            for crew in ship.crew:
-                self.crew_index[crew.id] = crew
-
         # Room index
         self.room_index = {}
         for ship in ships.values():
@@ -454,9 +400,6 @@ class ServerBattleState(net.Handler):
             if turn_number != self.turn_number:
                 return
             ship = self.ships[client_id]
-            # Handle crew paths
-            for crew_id, destination in packet.read().items():
-                self.crew_index[crew_id].destination = sf.Vector2(*destination)
             # Systems
             systems_power = packet.read()
             for system_id, power in systems_power.items():
@@ -488,8 +431,6 @@ class ServerBattleState(net.Handler):
                 self.turn_number += 1
 
     def prepare_simulation(self):
-        self.calculate_crew_paths()
-
         # Do weapons
         for ship in self.ships.values():
             if not ship.weapon_system:
@@ -519,23 +460,9 @@ class ServerBattleState(net.Handler):
                 else:
                     weapon.firing = False
 
-    def calculate_crew_paths(self):
-        for ship in self.ships.values():
-            for crew in ship.crew:
-                if not crew.destination:
-                    continue
-                pos = (crew.position.x, crew.position.y)
-                dest = (crew.destination.x, crew.destination.y)
-                crew.path = find_path(ship.path_grid, pos, dest) # coming soon!
-
     def send_simulation_results(self):
         packet = net.Packet()
         packet.write(const.packet_sim_result)
-        # Crew paths
-        paths_dict = {}
-        for crew in self.crew_index.values():
-            paths_dict[crew.id] = crew.path
-        packet.write(paths_dict)
         # Send system power
         systems_power = {}
         for id, system in self.system_index.items():
@@ -566,20 +493,6 @@ class ServerBattleState(net.Handler):
         self.server.broadcast(packet)
 
     def end_simulation(self):
-        # Move crew
-        for ship in self.ships.values():
-            for crew in ship.crew:
-                # Move
-                crew.position = crew.get_position_at_simulation_end() 
-                # Update crew's current room
-                crew.current_room = ship.room_at(crew.position.x, crew.position.y)
-                # Repair room if applicable
-                if not crew.path and crew.current_room.system and crew.current_room.system.damage > 0:
-                    crew.current_room.system.damage -= 1
-                # Clear crew paths for next turn
-                crew.destination = None
-                crew.path[:] = []
-
         # Deal projectile damage
         for ship in self.ships.values():
             if not ship.weapon_system:

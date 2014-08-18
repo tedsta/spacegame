@@ -8,7 +8,6 @@ import src.net as net
 from src.input_system import InputSystem
 from src.battle_state import ServerBattleState
 from src.ship import Ship
-from src.crew import Crew
 
 try:
     # Create the server connection

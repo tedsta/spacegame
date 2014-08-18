@@ -9,7 +9,6 @@ import src.net as net
 from src.input_system import InputSystem
 from src.battle_state import ClientBattleState
 from src.ship import Ship
-from src.crew import Crew
 from src.weapon import Weapon
 from src.weapon_system import WeaponSystem
 from src.shield_system import ShieldSystem
@@ -52,21 +51,10 @@ try:
     ship.add_room(const.room_weapons2x2, 3, 1)
     ship.add_room(const.room_shields2x2, 4, 4)
 
-    # Create a crew
-    ship.add_crew(Crew(), 0, 0)
-    ship.add_crew(Crew(), 1, 0)
-    ship.add_crew(Crew(), 0, 1)
-    ship.add_crew(Crew(), 1, 1)
-    ship.add_crew(Crew(), 3, 1)
-
     # Weapons!!!
     ship.add_weapon(Weapon(""))
     ship.add_weapon(Weapon(""))
     ship.add_weapon(Weapon(""))
-
-    # Setup crew IDs
-    for i, crew in enumerate(ship.crew):
-        crew.id = client.client_id+":crew"+str(i)
 
     # Setup weapon IDs
     if ship.weapon_system:
